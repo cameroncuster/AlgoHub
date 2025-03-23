@@ -73,7 +73,7 @@ $: if ($page) {
 
 <header class="sticky top-0 z-50 w-full bg-[var(--color-secondary)] py-3 shadow-sm">
   <div class="mx-auto flex max-w-[1200px] items-center justify-between px-3 sm:px-4 md:px-6">
-    <div class="flex items-center">
+    <div class="flex items-center pl-3 sm:pl-0">
       <a
         href="/"
         aria-label="Home"
@@ -86,7 +86,7 @@ $: if ($page) {
 
     <!-- Mobile menu button -->
     <button
-      class="flex items-center rounded-md border border-[var(--color-border)] px-2 py-1 text-[var(--color-text)] md:hidden"
+      class="mr-3 flex items-center rounded-md border border-[var(--color-border)] px-2 py-1 text-[var(--color-text)] sm:mr-0 md:hidden"
       aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
       on:click={toggleMobileMenu}
     >
