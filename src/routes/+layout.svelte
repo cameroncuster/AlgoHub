@@ -26,7 +26,9 @@ onMount(() => {
 <div class="flex min-h-screen flex-col">
   <Header />
 
-  <main class="relative mx-auto box-border flex w-full flex-1 flex-col overflow-x-hidden pt-1">
+  <main
+    class="relative mx-auto box-border flex w-full flex-1 flex-col overflow-x-hidden px-2 pt-1 sm:px-3 md:px-4"
+  >
     <slot />
   </main>
 </div>
@@ -43,27 +45,26 @@ onMount(() => {
 :global(.container) {
   width: 100%;
   box-sizing: border-box;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 /* Ensure content is centered properly */
 main {
   position: relative;
-  padding-left: 0;
-  padding-right: 0;
 }
 
 @media (min-width: 768px) {
-  main {
-    padding-left: 0;
+  :global(.container) {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 }
 
 @media (max-width: 768px) {
   :global(.container) {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 
@@ -72,7 +73,7 @@ main {
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
-  padding: 0;
+  padding: 0 0.5rem;
 }
 
 /* Ensure header and footer are at the ends */

@@ -219,6 +219,13 @@ function getDifficultyTooltip(problem: Problem): string {
   }
 }
 
+/* Remove margin between sidebar and table */
+@media (min-width: 768px) {
+  .table-wrapper {
+    margin-left: 0;
+  }
+}
+
 /* Ensure feedback buttons don't get cut off */
 td:last-child {
   min-width: 140px;

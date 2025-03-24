@@ -99,35 +99,33 @@ onMount(() => {
 
 <!-- Desktop sidebar (always visible) -->
 <div
-  class="fixed top-[80px] bottom-0 left-0 hidden w-64 border-r border-[var(--color-border)] bg-[var(--color-primary)] md:block"
+  class="fixed top-0 bottom-0 left-0 hidden w-[13rem] border-r border-[var(--color-border)] bg-[var(--color-primary)] pt-[80px] md:block"
 >
-  <div class="h-full">
-    <div class="sticky top-4">
-      <div class="w-full space-y-1 p-4">
+  <div class="h-full overflow-y-auto">
+    <div class="w-full space-y-1 p-3">
+      <button
+        class={`w-full rounded-md px-3 py-2 text-left transition-colors ${
+          selectedTopic === null
+            ? 'bg-[var(--color-secondary)] text-white'
+            : 'text-[var(--color-text)] hover:bg-[var(--color-tertiary)]'
+        }`}
+        on:click={() => onSelectTopic(null)}
+      >
+        All
+      </button>
+
+      {#each topics as topic}
         <button
           class={`w-full rounded-md px-3 py-2 text-left transition-colors ${
-            selectedTopic === null
+            selectedTopic === topic
               ? 'bg-[var(--color-secondary)] text-white'
               : 'text-[var(--color-text)] hover:bg-[var(--color-tertiary)]'
           }`}
-          on:click={() => onSelectTopic(null)}
+          on:click={() => onSelectTopic(topic)}
         >
-          All
+          {formatTopicName(topic)}
         </button>
-
-        {#each topics as topic}
-          <button
-            class={`w-full rounded-md px-3 py-2 text-left transition-colors ${
-              selectedTopic === topic
-                ? 'bg-[var(--color-secondary)] text-white'
-                : 'text-[var(--color-text)] hover:bg-[var(--color-tertiary)]'
-            }`}
-            on:click={() => onSelectTopic(topic)}
-          >
-            {formatTopicName(topic)}
-          </button>
-        {/each}
-      </div>
+      {/each}
     </div>
   </div>
 </div>
@@ -175,10 +173,10 @@ onMount(() => {
   }
 }
 
-/* Ensure sidebar has proper width and doesn't overlap */
-@media (min-width: 768px) {
-  :global(.md\:ml-64) {
-    margin-left: 16rem !important; /* 64px = 16rem */
-  }
+/* Ensure proper z-index and positioning */
+.sidebar {
+  z-index: 40;
 }
+
+/* Remove unused styles */
 </style>

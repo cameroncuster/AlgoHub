@@ -72,8 +72,8 @@ $: if ($page) {
 </script>
 
 <header class="sticky top-0 z-50 w-full bg-[var(--color-secondary)] py-3 shadow-sm">
-  <div class="mx-auto flex max-w-[1200px] items-center justify-between px-3 sm:px-4 md:px-6">
-    <div class="flex items-center pl-3 sm:pl-0">
+  <div class="mx-auto flex max-w-[1200px] items-center justify-between px-3 sm:px-4 md:px-5">
+    <div class="flex items-center">
       <a
         href="/"
         aria-label="Home"
@@ -86,7 +86,7 @@ $: if ($page) {
 
     <!-- Mobile menu button -->
     <button
-      class="mr-3 flex items-center rounded-md border border-[var(--color-border)] px-2 py-1 text-[var(--color-text)] sm:mr-0 md:hidden"
+      class="flex items-center rounded-md border border-[var(--color-border)] px-2 py-1 text-[var(--color-text)] md:hidden"
       aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
       on:click={toggleMobileMenu}
     >
@@ -149,7 +149,7 @@ $: if ($page) {
         {/if}
       </ul>
       <div
-        class="flex min-w-[70px] items-center justify-end opacity-100 transition-opacity duration-200 {authLoading
+        class="mr-4 flex min-w-[70px] items-center justify-end opacity-100 transition-opacity duration-200 sm:mr-2 md:mr-0 {authLoading
           ? 'invisible opacity-0'
           : ''}"
       >
@@ -176,7 +176,7 @@ $: if ($page) {
   <!-- Mobile menu -->
   {#if mobileMenuOpen}
     <div
-      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-3 py-4 shadow-md md:hidden"
+      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-md md:hidden"
     >
       <nav class="flex flex-col gap-4">
         <ul class="m-0 flex list-none flex-col gap-4 p-0">
@@ -205,7 +205,7 @@ $: if ($page) {
           {/if}
         </ul>
         <div
-          class="mt-2 flex items-center justify-start {authLoading ? 'invisible opacity-0' : ''}"
+          class="mt-2 flex items-center justify-start px-1 {authLoading ? 'invisible opacity-0' : ''}"
         >
           {#if $user}
             <button

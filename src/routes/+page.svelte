@@ -269,7 +269,7 @@ $: {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 </svelte:head>
 
-<div class="mx-auto w-full max-w-[1200px]">
+<div class="mx-auto w-full max-w-[1200px] px-0">
   {#if loading}
     <div class="py-2 text-center">
       <svg
@@ -309,9 +309,9 @@ $: {
       />
 
       <!-- Main content -->
-      <div class="flex w-full flex-1">
-        <div class="w-full md:mr-32 md:ml-32">
-          <div class="problem-table-container w-full px-2 py-1">
+      <div class="flex w-full flex-1 md:pl-[14rem]">
+        <div class="w-full min-w-0 px-0 py-2">
+          <div class="problem-table-container w-full">
             <ProblemTable
               problems={filteredProblems}
               userFeedback={userFeedback}
@@ -331,11 +331,15 @@ $: {
   }
 }
 
-/* Ensure proper spacing between sidebar and table */
+/* Remove excess margin from table container */
+.problem-table-container {
+  width: 100%;
+  margin: 0;
+}
+
 @media (min-width: 768px) {
   .problem-table-container {
-    margin: 0 auto;
-    width: 100%;
+    margin: 0;
   }
 }
 </style>
