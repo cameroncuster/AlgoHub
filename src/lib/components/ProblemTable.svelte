@@ -105,7 +105,7 @@ function getDifficultyTooltip(problem: Problem): string {
                 <span
                   class="invisible absolute bottom-full left-1/2 z-50 -translate-x-1/2 transform rounded-md border border-[var(--color-border)] bg-[var(--color-secondary)] text-left text-xs leading-relaxed font-normal whitespace-pre-line text-[var(--color-text)] opacity-0 shadow-md transition-opacity duration-300 group-hover:visible group-hover:opacity-100 {problem.source === 'codeforces'
                     ? 'w-auto max-w-fit min-w-0 p-1.5 px-3 text-center whitespace-nowrap'
-                    : 'w-[280px] p-2.5'} mb-1"
+                    : 'w-[280px] p-2.5'} mb-0.3"
                 >
                   {getDifficultyTooltip(problem)}
                 </span>
