@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { Problem } from '$lib/services/problem';
+import { user } from '$lib/services/auth';
 // Use static image paths instead of imports
 const codeforcesLogo = '/images/codeforces.png';
 const kattisLogo = '/images/kattis.png';
@@ -8,6 +9,14 @@ const kattisLogo = '/images/kattis.png';
 export let problems: Problem[] = [];
 export let userFeedback: Record<string, 'like' | 'dislike' | null> = {};
 export let onLike: (problemId: string, isLike: boolean) => Promise<void>;
+
+// State
+let isAuthenticated = false;
+
+// Subscribe to auth state
+user.subscribe((value) => {
+  isAuthenticated = !!value;
+});
 
 // Define common tiers
 const TIERS = [
@@ -144,9 +153,14 @@ function getDifficultyTooltip(problem: Problem): string {
                       ${hasLiked 
                         ? 'border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] text-[rgb(34_197_94)]' 
                         : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)]'
-                      }`}
-                    on:click={() => onLike(problem.id!, true)}
-                    title={hasLiked ? 'Undo like' : 'Like this problem'}
+                      } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
+                    on:click={() => isAuthenticated && onLike(problem.id!, true)}
+                    title={!isAuthenticated 
+                      ? 'Sign in to like problems' 
+                      : hasLiked 
+                        ? 'Undo like' 
+                        : 'Like this problem'}
+                    disabled={!isAuthenticated}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -172,9 +186,14 @@ function getDifficultyTooltip(problem: Problem): string {
                       ${hasDisliked 
                         ? 'border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] text-[rgb(239_68_68)]' 
                         : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] hover:text-[rgb(239_68_68)]'
-                      }`}
-                    on:click={() => onLike(problem.id!, false)}
-                    title={hasDisliked ? 'Undo dislike' : 'Dislike this problem'}
+                      } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
+                    on:click={() => isAuthenticated && onLike(problem.id!, false)}
+                    title={!isAuthenticated 
+                      ? 'Sign in to dislike problems' 
+                      : hasDisliked 
+                        ? 'Undo dislike' 
+                        : 'Dislike this problem'}
+                    disabled={!isAuthenticated}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

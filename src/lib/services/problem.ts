@@ -2,6 +2,8 @@
  * Service for database operations related to programming problems
  */
 import { supabase } from './database';
+import { user } from './auth';
+import { get } from 'svelte/store';
 
 /**
  * Problem interface from our app's perspective
@@ -29,6 +31,15 @@ export type ProblemRecord = Omit<Problem, 'dateAdded' | 'addedBy' | 'addedByUrl'
   date_added: string;
   added_by: string;
   added_by_url: string;
+};
+
+/**
+ * User feedback type
+ */
+export type UserFeedback = {
+  user_id: string;
+  problem_id: string;
+  feedback_type: 'like' | 'dislike';
 };
 
 /**
@@ -176,6 +187,41 @@ export async function fetchProblems(): Promise<Problem[]> {
 }
 
 /**
+ * Fetches user's feedback for all problems
+ * @returns Record of problemId to feedback type ('like' | 'dislike' | null)
+ */
+export async function fetchUserFeedback(): Promise<Record<string, 'like' | 'dislike' | null>> {
+  const currentUser = get(user);
+
+  if (!currentUser) {
+    return {};
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('user_problem_feedback')
+      .select('problem_id, feedback_type')
+      .eq('user_id', currentUser.id);
+
+    if (error) {
+      console.error('Error fetching user feedback:', error);
+      return {};
+    }
+
+    const feedbackMap: Record<string, 'like' | 'dislike' | null> = {};
+
+    data.forEach((item) => {
+      feedbackMap[item.problem_id] = item.feedback_type as 'like' | 'dislike';
+    });
+
+    return feedbackMap;
+  } catch (err) {
+    console.error('Failed to fetch user feedback:', err);
+    return {};
+  }
+}
+
+/**
  * Updates a problem's likes or dislikes in the database
  * @param problemId - Problem ID
  * @param isLike - Whether it's a like (true) or dislike (false)
@@ -189,6 +235,13 @@ export async function updateProblemFeedback(
   isUndo: boolean = false,
   previousFeedback: 'like' | 'dislike' | null = null
 ): Promise<Problem | null> {
+  const currentUser = get(user);
+
+  if (!currentUser) {
+    console.error('Cannot update feedback: User not authenticated');
+    return null;
+  }
+
   try {
     // First get the current problem to get current like/dislike counts
     const { data: currentProblem, error: fetchError } = await supabase
@@ -210,23 +263,51 @@ export async function updateProblemFeedback(
       updateData = isLike
         ? { likes: Math.max(0, (currentProblem.likes || 0) - 1) }
         : { dislikes: Math.max(0, (currentProblem.dislikes || 0) - 1) };
+
+      // Delete the user feedback record
+      await supabase
+        .from('user_problem_feedback')
+        .delete()
+        .eq('user_id', currentUser.id)
+        .eq('problem_id', problemId);
     } else if (previousFeedback === 'like' && !isLike) {
       // Switching from like to dislike
       updateData = {
         likes: Math.max(0, (currentProblem.likes || 0) - 1),
         dislikes: (currentProblem.dislikes || 0) + 1
       };
+
+      // Update the user feedback record
+      await supabase
+        .from('user_problem_feedback')
+        .update({ feedback_type: 'dislike' })
+        .eq('user_id', currentUser.id)
+        .eq('problem_id', problemId);
     } else if (previousFeedback === 'dislike' && isLike) {
       // Switching from dislike to like
       updateData = {
         likes: (currentProblem.likes || 0) + 1,
         dislikes: Math.max(0, (currentProblem.dislikes || 0) - 1)
       };
+
+      // Update the user feedback record
+      await supabase
+        .from('user_problem_feedback')
+        .update({ feedback_type: 'like' })
+        .eq('user_id', currentUser.id)
+        .eq('problem_id', problemId);
     } else {
       // New feedback
       updateData = isLike
         ? { likes: (currentProblem.likes || 0) + 1 }
         : { dislikes: (currentProblem.dislikes || 0) + 1 };
+
+      // Insert new user feedback record
+      await supabase.from('user_problem_feedback').insert({
+        user_id: currentUser.id,
+        problem_id: problemId,
+        feedback_type: isLike ? 'like' : 'dislike'
+      });
     }
 
     // Update the problem

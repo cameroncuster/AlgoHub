@@ -1,8 +1,9 @@
 <script lang="ts">
 import { onMount } from 'svelte';
 import { browser } from '$app/environment';
-import { fetchProblems, updateProblemFeedback } from '$lib/services/problem';
+import { fetchProblems, updateProblemFeedback, fetchUserFeedback } from '$lib/services/problem';
 import type { Problem } from '$lib/services/problem';
+import { user } from '$lib/services/auth';
 import ProblemTable from '$lib/components/ProblemTable.svelte';
 import TopicSidebar from '$lib/components/TopicSidebar.svelte';
 
@@ -14,6 +15,7 @@ let userFeedback: Record<string, 'like' | 'dislike' | null> = {};
 let selectedTopic: string | null = null;
 let sidebarOpen = false; // Default closed on mobile
 let isMobile = false;
+let isAuthenticated = false;
 
 // Problem types
 const PROBLEM_TYPES = ['graph', 'array', 'string', 'math', 'tree', 'queries', 'geometry', 'misc'];
@@ -95,6 +97,12 @@ function checkMobile(): void {
 // Function to handle like/dislike actions
 async function handleLike(problemId: string, isLike: boolean): Promise<void> {
   try {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      error = 'You must be signed in to like or dislike problems';
+      return;
+    }
+
     // Check if user has already provided feedback for this problem
     const currentFeedback = userFeedback[problemId];
 
@@ -117,9 +125,6 @@ async function handleLike(problemId: string, isLike: boolean): Promise<void> {
         ...userFeedback,
         [problemId]: null
       };
-
-      // Save feedback to localStorage
-      localStorage.setItem('userFeedback', JSON.stringify(userFeedback));
 
       // Update the database
       await updateProblemFeedback(problemId, isLike, true);
@@ -159,9 +164,6 @@ async function handleLike(problemId: string, isLike: boolean): Promise<void> {
         [problemId]: isLike ? 'like' : 'dislike'
       };
 
-      // Save feedback to localStorage
-      localStorage.setItem('userFeedback', JSON.stringify(userFeedback));
-
       // Update the database
       await updateProblemFeedback(problemId, isLike, false, currentFeedback);
 
@@ -189,9 +191,6 @@ async function handleLike(problemId: string, isLike: boolean): Promise<void> {
       [problemId]: isLike ? 'like' : 'dislike'
     };
 
-    // Save feedback to localStorage
-    localStorage.setItem('userFeedback', JSON.stringify(userFeedback));
-
     // Update the database
     await updateProblemFeedback(problemId, isLike);
 
@@ -218,6 +217,11 @@ async function loadProblems() {
 
     // Initialize filtered problems
     filteredProblems = [...problems];
+
+    // Load user feedback from database if authenticated
+    if (isAuthenticated) {
+      userFeedback = await fetchUserFeedback();
+    }
   } catch (e) {
     console.error('Error loading problems:', e);
     error = 'Failed to load problems. Please try again later.';
@@ -230,38 +234,32 @@ async function loadProblems() {
 onMount(() => {
   loadProblems();
 
-  // Load user feedback from localStorage
-  const savedFeedback = localStorage.getItem('userFeedback');
-  if (savedFeedback) {
-    try {
-      userFeedback = JSON.parse(savedFeedback);
-    } catch (e) {
-      console.error('Failed to parse saved feedback', e);
+  // Subscribe to auth state changes
+  const unsubscribe = user.subscribe((value) => {
+    isAuthenticated = !!value;
+
+    // Reload user feedback when auth state changes
+    if (isAuthenticated) {
+      fetchUserFeedback().then((feedback) => {
+        userFeedback = feedback;
+      });
+    } else {
       userFeedback = {};
     }
-  }
+  });
 
   // Check if mobile
   checkMobile();
 
-  // Add event listeners
-  if (browser) {
-    window.addEventListener('resize', checkMobile);
-  }
+  // Add resize event listener
+  window.addEventListener('resize', checkMobile);
 
+  // Cleanup function
   return () => {
-    if (browser) {
-      window.removeEventListener('resize', checkMobile);
-    }
+    unsubscribe();
+    window.removeEventListener('resize', checkMobile);
   };
 });
-
-// Save user feedback to localStorage when it changes
-$: {
-  if (Object.keys(userFeedback).length > 0 && browser) {
-    localStorage.setItem('userFeedback', JSON.stringify(userFeedback));
-  }
-}
 </script>
 
 <svelte:head>
