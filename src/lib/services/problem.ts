@@ -243,99 +243,39 @@ export async function updateProblemFeedback(
   }
 
   try {
-    // First get the current problem to get current like/dislike counts
-    const { data: currentProblem, error: fetchError } = await supabase
-      .from('problems')
-      .select('*')
-      .eq('id', problemId)
-      .single();
-
-    if (fetchError || !currentProblem) {
-      console.error(`Error fetching problem ${problemId}:`, fetchError);
-      return null;
-    }
-
-    // Prepare the update data based on the action
-    let updateData: { likes?: number; dislikes?: number } = {};
-
-    if (isUndo) {
-      // Undoing a previous action
-      updateData = isLike
-        ? { likes: Math.max(0, (currentProblem.likes || 0) - 1) }
-        : { dislikes: Math.max(0, (currentProblem.dislikes || 0) - 1) };
-
-      // Delete the user feedback record
-      await supabase
-        .from('user_problem_feedback')
-        .delete()
-        .eq('user_id', currentUser.id)
-        .eq('problem_id', problemId);
-    } else if (previousFeedback === 'like' && !isLike) {
-      // Switching from like to dislike
-      updateData = {
-        likes: Math.max(0, (currentProblem.likes || 0) - 1),
-        dislikes: (currentProblem.dislikes || 0) + 1
-      };
-
-      // Update the user feedback record
-      await supabase
-        .from('user_problem_feedback')
-        .update({ feedback_type: 'dislike' })
-        .eq('user_id', currentUser.id)
-        .eq('problem_id', problemId);
-    } else if (previousFeedback === 'dislike' && isLike) {
-      // Switching from dislike to like
-      updateData = {
-        likes: (currentProblem.likes || 0) + 1,
-        dislikes: Math.max(0, (currentProblem.dislikes || 0) - 1)
-      };
-
-      // Update the user feedback record
-      await supabase
-        .from('user_problem_feedback')
-        .update({ feedback_type: 'like' })
-        .eq('user_id', currentUser.id)
-        .eq('problem_id', problemId);
-    } else {
-      // New feedback
-      updateData = isLike
-        ? { likes: (currentProblem.likes || 0) + 1 }
-        : { dislikes: (currentProblem.dislikes || 0) + 1 };
-
-      // Insert new user feedback record
-      await supabase.from('user_problem_feedback').insert({
-        user_id: currentUser.id,
-        problem_id: problemId,
-        feedback_type: isLike ? 'like' : 'dislike'
-      });
-    }
-
-    // Update the problem
-    const { data, error } = await supabase
-      .from('problems')
-      .update(updateData)
-      .eq('id', problemId)
-      .select()
-      .single();
+    // Call the stored procedure to handle the transaction
+    const { data, error } = await supabase.rpc('update_problem_feedback', {
+      p_problem_id: problemId,
+      p_user_id: currentUser.id,
+      p_is_like: isLike,
+      p_is_undo: isUndo,
+      p_previous_feedback: previousFeedback
+    });
 
     if (error) {
-      console.error(`Error updating problem ${problemId}:`, error);
+      console.error(`Error updating feedback for problem ${problemId}:`, error);
       return null;
     }
 
-    const record = data as ProblemRecord;
+    if (!data || data.length === 0) {
+      console.error('No data returned from stored procedure');
+      return null;
+    }
+
+    // The stored procedure returns the updated problem record
+    const record = data[0] as ProblemRecord;
     return {
       id: record.id,
       name: record.name,
-      tags: record.tags,
+      tags: record.tags || [],
       difficulty: record.difficulty,
       url: record.url,
       solved: record.solved || 0,
       dateAdded: record.date_added,
       addedBy: record.added_by,
       addedByUrl: record.added_by_url,
-      likes: record.likes,
-      dislikes: record.dislikes,
+      likes: record.likes || 0,
+      dislikes: record.dislikes || 0,
       source: getProblemSource(record.url),
       type: record.type
     };
