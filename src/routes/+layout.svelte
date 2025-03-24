@@ -1,4 +1,5 @@
 <script lang="ts">
+import Footer from '$lib/components/Footer.svelte';
 import Header from '$lib/components/Header.svelte';
 import '../app.css';
 import { onMount } from 'svelte';
@@ -31,6 +32,8 @@ onMount(() => {
   >
     <slot />
   </main>
+
+  <Footer />
 </div>
 
 <style>
@@ -80,5 +83,7 @@ main {
 :global(header),
 :global(footer) {
   width: 100%;
+  position: relative;
+  z-index: 30;
 }
 </style>

@@ -310,7 +310,7 @@ $: {
 
       <!-- Main content -->
       <div class="flex w-full flex-1 md:pl-[14rem]">
-        <div class="w-full min-w-0 px-0 py-2">
+        <div class="w-full min-w-0 px-0 py-2 pb-6">
           <div class="problem-table-container w-full">
             <ProblemTable
               problems={filteredProblems}

@@ -99,9 +99,9 @@ onMount(() => {
 
 <!-- Desktop sidebar (always visible) -->
 <div
-  class="fixed top-0 bottom-0 left-0 hidden w-[13rem] border-r border-[var(--color-border)] bg-[var(--color-primary)] pt-[80px] md:block"
+  class="absolute top-[60px] bottom-auto left-0 hidden w-[13rem] border-r border-[var(--color-border)] bg-[var(--color-primary)] md:block"
 >
-  <div class="h-full overflow-y-auto">
+  <div class="h-[calc(100vh-140px)] overflow-y-auto">
     <div class="w-full space-y-1 p-3">
       <button
         class={`w-full rounded-md px-3 py-2 text-left transition-colors ${
@@ -179,4 +179,13 @@ onMount(() => {
 }
 
 /* Remove unused styles */
+
+/* Ensure sidebar doesn't overlap footer */
+@media (min-width: 768px) {
+  /* Desktop styles */
+  div[class*='absolute top-[60px]'] {
+    height: auto;
+    min-height: calc(100vh - 140px);
+  }
+}
 </style>
