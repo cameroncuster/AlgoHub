@@ -47,7 +47,7 @@ AFTER
 INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 -- Create problems table if it doesn't exist
 CREATE TABLE IF NOT EXISTS problems (
-  id TEXT PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
   tags TEXT [] NOT NULL DEFAULT '{}',
   difficulty INTEGER,
@@ -87,3 +87,131 @@ UPDATE USING (
   );
 -- Disable deletion of problems entirely
 -- We don't want to allow deletion of problems at all
+-- Create user_problem_feedback table to store user likes/dislikes
+CREATE TABLE IF NOT EXISTS user_problem_feedback (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
+  feedback_type TEXT NOT NULL CHECK (feedback_type IN ('like', 'dislike')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, problem_id)
+);
+-- Create RLS policies for user_problem_feedback table
+ALTER TABLE user_problem_feedback ENABLE ROW LEVEL SECURITY;
+-- Users can read all feedback (needed for displaying aggregated likes/dislikes)
+CREATE POLICY "Anyone can read feedback" ON user_problem_feedback FOR
+SELECT USING (true);
+-- Users can only insert/update their own feedback
+CREATE POLICY "Users can insert their own feedback" ON user_problem_feedback FOR
+INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own feedback" ON user_problem_feedback FOR
+UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own feedback" ON user_problem_feedback FOR DELETE USING (auth.uid() = user_id);
+-- Create trigger function to update the updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = NOW();
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+-- Create trigger for user_problem_feedback table
+CREATE TRIGGER update_user_problem_feedback_updated_at BEFORE
+UPDATE ON user_problem_feedback FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Create stored procedure for updating problem feedback in a transaction
+CREATE OR REPLACE FUNCTION update_problem_feedback(
+    p_problem_id UUID,
+    p_user_id UUID,
+    p_is_like BOOLEAN,
+    p_is_undo BOOLEAN DEFAULT FALSE,
+    p_previous_feedback TEXT DEFAULT NULL
+  ) RETURNS SETOF problems AS $$
+DECLARE v_problem problems %ROWTYPE;
+v_feedback_exists BOOLEAN;
+v_feedback_type TEXT;
+BEGIN -- Lock the problem record for update to prevent race conditions
+SELECT * INTO v_problem
+FROM problems
+WHERE id = p_problem_id FOR
+UPDATE;
+IF NOT FOUND THEN RAISE EXCEPTION 'Problem with ID % not found',
+p_problem_id;
+END IF;
+-- Check if user already has feedback for this problem
+SELECT EXISTS(
+    SELECT 1
+    FROM user_problem_feedback
+    WHERE user_id = p_user_id
+      AND problem_id = p_problem_id
+  ) INTO v_feedback_exists;
+IF v_feedback_exists THEN
+SELECT feedback_type INTO v_feedback_type
+FROM user_problem_feedback
+WHERE user_id = p_user_id
+  AND problem_id = p_problem_id;
+END IF;
+-- Handle different feedback scenarios
+IF p_is_undo THEN -- Undoing previous action
+IF p_is_like THEN -- Undo a like
+UPDATE problems
+SET likes = GREATEST(0, likes - 1)
+WHERE id = p_problem_id;
+ELSE -- Undo a dislike
+UPDATE problems
+SET dislikes = GREATEST(0, dislikes - 1)
+WHERE id = p_problem_id;
+END IF;
+-- Remove the feedback record
+DELETE FROM user_problem_feedback
+WHERE user_id = p_user_id
+  AND problem_id = p_problem_id;
+ELSIF p_previous_feedback = 'like'
+AND NOT p_is_like THEN -- Switching from like to dislike
+UPDATE problems
+SET likes = GREATEST(0, likes - 1),
+  dislikes = dislikes + 1
+WHERE id = p_problem_id;
+-- Update the feedback record
+UPDATE user_problem_feedback
+SET feedback_type = 'dislike'
+WHERE user_id = p_user_id
+  AND problem_id = p_problem_id;
+ELSIF p_previous_feedback = 'dislike'
+AND p_is_like THEN -- Switching from dislike to like
+UPDATE problems
+SET likes = likes + 1,
+  dislikes = GREATEST(0, dislikes - 1)
+WHERE id = p_problem_id;
+-- Update the feedback record
+UPDATE user_problem_feedback
+SET feedback_type = 'like'
+WHERE user_id = p_user_id
+  AND problem_id = p_problem_id;
+ELSE -- New feedback
+IF p_is_like THEN -- New like
+UPDATE problems
+SET likes = likes + 1
+WHERE id = p_problem_id;
+ELSE -- New dislike
+UPDATE problems
+SET dislikes = dislikes + 1
+WHERE id = p_problem_id;
+END IF;
+-- Insert new feedback record
+INSERT INTO user_problem_feedback (user_id, problem_id, feedback_type)
+VALUES (
+    p_user_id,
+    p_problem_id,
+    CASE
+      WHEN p_is_like THEN 'like'
+      ELSE 'dislike'
+    END
+  );
+END IF;
+-- Return the updated problem
+RETURN QUERY
+SELECT *
+FROM problems
+WHERE id = p_problem_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+-- Ensure the function is accessible to authenticated users
+GRANT EXECUTE ON FUNCTION update_problem_feedback TO authenticated;

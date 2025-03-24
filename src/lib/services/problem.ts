@@ -2,6 +2,8 @@
  * Service for database operations related to programming problems
  */
 import { supabase } from './database';
+import { user } from './auth';
+import { get } from 'svelte/store';
 
 /**
  * Problem interface from our app's perspective
@@ -29,6 +31,15 @@ export type ProblemRecord = Omit<Problem, 'dateAdded' | 'addedBy' | 'addedByUrl'
   date_added: string;
   added_by: string;
   added_by_url: string;
+};
+
+/**
+ * User feedback type
+ */
+export type UserFeedback = {
+  user_id: string;
+  problem_id: string;
+  feedback_type: 'like' | 'dislike';
 };
 
 /**
@@ -176,6 +187,41 @@ export async function fetchProblems(): Promise<Problem[]> {
 }
 
 /**
+ * Fetches user's feedback for all problems
+ * @returns Record of problemId to feedback type ('like' | 'dislike' | null)
+ */
+export async function fetchUserFeedback(): Promise<Record<string, 'like' | 'dislike' | null>> {
+  const currentUser = get(user);
+
+  if (!currentUser) {
+    return {};
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('user_problem_feedback')
+      .select('problem_id, feedback_type')
+      .eq('user_id', currentUser.id);
+
+    if (error) {
+      console.error('Error fetching user feedback:', error);
+      return {};
+    }
+
+    const feedbackMap: Record<string, 'like' | 'dislike' | null> = {};
+
+    data.forEach((item) => {
+      feedbackMap[item.problem_id] = item.feedback_type as 'like' | 'dislike';
+    });
+
+    return feedbackMap;
+  } catch (err) {
+    console.error('Failed to fetch user feedback:', err);
+    return {};
+  }
+}
+
+/**
  * Updates a problem's likes or dislikes in the database
  * @param problemId - Problem ID
  * @param isLike - Whether it's a like (true) or dislike (false)
@@ -189,72 +235,47 @@ export async function updateProblemFeedback(
   isUndo: boolean = false,
   previousFeedback: 'like' | 'dislike' | null = null
 ): Promise<Problem | null> {
+  const currentUser = get(user);
+
+  if (!currentUser) {
+    console.error('Cannot update feedback: User not authenticated');
+    return null;
+  }
+
   try {
-    // First get the current problem to get current like/dislike counts
-    const { data: currentProblem, error: fetchError } = await supabase
-      .from('problems')
-      .select('*')
-      .eq('id', problemId)
-      .single();
-
-    if (fetchError || !currentProblem) {
-      console.error(`Error fetching problem ${problemId}:`, fetchError);
-      return null;
-    }
-
-    // Prepare the update data based on the action
-    let updateData: { likes?: number; dislikes?: number } = {};
-
-    if (isUndo) {
-      // Undoing a previous action
-      updateData = isLike
-        ? { likes: Math.max(0, (currentProblem.likes || 0) - 1) }
-        : { dislikes: Math.max(0, (currentProblem.dislikes || 0) - 1) };
-    } else if (previousFeedback === 'like' && !isLike) {
-      // Switching from like to dislike
-      updateData = {
-        likes: Math.max(0, (currentProblem.likes || 0) - 1),
-        dislikes: (currentProblem.dislikes || 0) + 1
-      };
-    } else if (previousFeedback === 'dislike' && isLike) {
-      // Switching from dislike to like
-      updateData = {
-        likes: (currentProblem.likes || 0) + 1,
-        dislikes: Math.max(0, (currentProblem.dislikes || 0) - 1)
-      };
-    } else {
-      // New feedback
-      updateData = isLike
-        ? { likes: (currentProblem.likes || 0) + 1 }
-        : { dislikes: (currentProblem.dislikes || 0) + 1 };
-    }
-
-    // Update the problem
-    const { data, error } = await supabase
-      .from('problems')
-      .update(updateData)
-      .eq('id', problemId)
-      .select()
-      .single();
+    // Call the stored procedure to handle the transaction
+    const { data, error } = await supabase.rpc('update_problem_feedback', {
+      p_problem_id: problemId,
+      p_user_id: currentUser.id,
+      p_is_like: isLike,
+      p_is_undo: isUndo,
+      p_previous_feedback: previousFeedback
+    });
 
     if (error) {
-      console.error(`Error updating problem ${problemId}:`, error);
+      console.error(`Error updating feedback for problem ${problemId}:`, error);
       return null;
     }
 
-    const record = data as ProblemRecord;
+    if (!data || data.length === 0) {
+      console.error('No data returned from stored procedure');
+      return null;
+    }
+
+    // The stored procedure returns the updated problem record
+    const record = data[0] as ProblemRecord;
     return {
       id: record.id,
       name: record.name,
-      tags: record.tags,
+      tags: record.tags || [],
       difficulty: record.difficulty,
       url: record.url,
       solved: record.solved || 0,
       dateAdded: record.date_added,
       addedBy: record.added_by,
       addedByUrl: record.added_by_url,
-      likes: record.likes,
-      dislikes: record.dislikes,
+      likes: record.likes || 0,
+      dislikes: record.dislikes || 0,
       source: getProblemSource(record.url),
       type: record.type
     };
