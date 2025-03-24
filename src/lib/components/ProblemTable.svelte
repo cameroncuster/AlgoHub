@@ -217,12 +217,6 @@ function getDifficultyTooltip(problem: Problem): string {
               </div>
             </td>
           </tr>
-        {:else}
-          <tr>
-            <td colspan="6" class="p-6 text-center text-[var(--color-text-muted)]">
-              No problems found with the selected filter.
-            </td>
-          </tr>
         {/each}
       </tbody>
     </table>

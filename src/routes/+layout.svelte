@@ -28,7 +28,7 @@ onMount(() => {
   <Header />
 
   <main
-    class="relative mx-auto box-border flex w-full flex-1 flex-col overflow-x-hidden px-2 pt-1 sm:px-3 md:px-4"
+    class="relative mx-auto box-border flex w-full flex-1 flex-col overflow-x-hidden px-2 sm:px-3 md:px-4"
   >
     <slot />
   </main>
