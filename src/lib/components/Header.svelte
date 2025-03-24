@@ -71,8 +71,8 @@ $: if ($page) {
 }
 </script>
 
-<header class="sticky top-0 z-50 bg-[var(--color-secondary)] py-3 shadow-sm">
-  <div class="mx-auto flex max-w-7xl items-center justify-between px-3 sm:px-4 md:px-6">
+<header class="sticky top-0 z-50 w-full bg-[var(--color-secondary)] py-3 shadow-sm">
+  <div class="mx-auto flex max-w-[1200px] items-center justify-between px-3 sm:px-4 md:px-5">
     <div class="flex items-center">
       <a
         href="/"
@@ -149,7 +149,7 @@ $: if ($page) {
         {/if}
       </ul>
       <div
-        class="flex min-w-[70px] items-center justify-end opacity-100 transition-opacity duration-200 {authLoading
+        class="mr-4 flex min-w-[70px] items-center justify-end opacity-100 transition-opacity duration-200 sm:mr-2 md:mr-0 {authLoading
           ? 'invisible opacity-0'
           : ''}"
       >
@@ -176,7 +176,7 @@ $: if ($page) {
   <!-- Mobile menu -->
   {#if mobileMenuOpen}
     <div
-      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-3 py-4 shadow-md md:hidden"
+      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-md md:hidden"
     >
       <nav class="flex flex-col gap-4">
         <ul class="m-0 flex list-none flex-col gap-4 p-0">
@@ -205,7 +205,7 @@ $: if ($page) {
           {/if}
         </ul>
         <div
-          class="mt-2 flex items-center justify-start {authLoading ? 'invisible opacity-0' : ''}"
+          class="mt-2 flex items-center justify-start px-1 {authLoading ? 'invisible opacity-0' : ''}"
         >
           {#if $user}
             <button
@@ -244,5 +244,11 @@ $: if ($page) {
 
 div.md\:hidden {
   animation: slideDown 0.2s ease-out;
+}
+
+/* Ensure header is at the top */
+header {
+  left: 0;
+  right: 0;
 }
 </style>
