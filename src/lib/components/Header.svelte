@@ -16,6 +16,10 @@ let mobileMenuOpen = false;
 // Track admin status
 let isUserAdmin = false;
 
+// User information from GitHub OAuth
+let username = '';
+let githubUrl = '';
+
 onMount(() => {
   // Mark component as mounted
   isMounted = true;
@@ -30,8 +34,49 @@ onMount(() => {
       // Check if the user is an admin
       if (value) {
         isUserAdmin = await isAdmin(value.id);
+
+        // Get username and GitHub URL from user metadata
+        if (value.user_metadata) {
+          // Get username with priority order
+          if (value.user_metadata.user_name) {
+            username = value.user_metadata.user_name;
+          } else if (value.user_metadata.preferred_username) {
+            username = value.user_metadata.preferred_username;
+          } else if (value.user_metadata.name) {
+            username = value.user_metadata.name;
+          } else if (value.email) {
+            // Fallback to email if no username is available
+            username = value.email.split('@')[0];
+          } else {
+            username = 'User';
+          }
+
+          // Get GitHub URL
+          if (value.app_metadata && value.app_metadata.provider === 'github') {
+            githubUrl = `https://github.com/${username}`;
+          } else if (value.user_metadata.html_url) {
+            githubUrl = value.user_metadata.html_url;
+          } else if (
+            value.user_metadata.avatar_url &&
+            value.user_metadata.avatar_url.includes('github')
+          ) {
+            // Extract username from GitHub avatar URL if available
+            // Format is usually: https://avatars.githubusercontent.com/u/12345678?v=4
+            githubUrl = `https://github.com/${username}`;
+          } else {
+            githubUrl = `https://github.com/${username}`;
+          }
+        } else if (value.email) {
+          username = value.email.split('@')[0];
+          githubUrl = '';
+        } else {
+          username = 'User';
+          githubUrl = '';
+        }
       } else {
         isUserAdmin = false;
+        username = '';
+        githubUrl = '';
       }
     }
   });
@@ -149,11 +194,19 @@ $: if ($page) {
         {/if}
       </ul>
       <div
-        class="mr-4 flex min-w-[70px] items-center justify-end opacity-100 transition-opacity duration-200 sm:mr-2 md:mr-0 {authLoading
+        class="mr-4 flex min-w-[70px] items-center justify-end gap-3 opacity-100 transition-opacity duration-200 sm:mr-2 md:mr-0 {authLoading
           ? 'invisible opacity-0'
           : ''}"
       >
         {#if $user}
+          <a
+            href={githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm font-medium text-[var(--color-heading)] transition-colors duration-200 hover:text-[var(--color-accent)]"
+          >
+            @{username}
+          </a>
           <button
             class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,black_5%,transparent)]"
             on:click={handleLogout}
@@ -205,9 +258,17 @@ $: if ($page) {
           {/if}
         </ul>
         <div
-          class="mt-2 flex items-center justify-start px-1 {authLoading ? 'invisible opacity-0' : ''}"
+          class="mt-2 flex items-center justify-start gap-3 px-1 {authLoading ? 'invisible opacity-0' : ''}"
         >
           {#if $user}
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm font-medium text-[var(--color-heading)] transition-colors duration-200 hover:text-[var(--color-accent)]"
+            >
+              @{username}
+            </a>
             <button
               class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,black_5%,transparent)]"
               on:click={handleLogout}
