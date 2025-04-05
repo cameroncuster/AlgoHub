@@ -85,8 +85,11 @@ function getDifficultyTooltip(problem: Problem): string {
       <tbody>
         {#each problems as problem}
           <tr
-            class="border-b border-[var(--color-border)] last:border-b-0 hover:bg-black/5
-            ${problem.id && userSolvedProblems.has(problem.id) ? 'bg-[color-mix(in_oklab,rgb(34_197_94)_8%,transparent)]' : ''}"
+            class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0
+            ${problem.id && userSolvedProblems.has(problem.id)
+              ? 'bg-[color-mix(in_oklab,rgb(34_197_94)_15%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_20%,transparent)]'
+              : 'hover:bg-black/5'}"
+            style={problem.id && userSolvedProblems.has(problem.id) ? 'border-left: 4px solid rgb(34, 197, 94); box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.05);' : ''}
           >
             <td class="p-3 text-center">
               <span class="flex items-center justify-center">
@@ -224,10 +227,10 @@ function getDifficultyTooltip(problem: Problem): string {
 
                   <!-- Solved button -->
                   <button
-                    class={`flex h-8 w-8 cursor-pointer items-center justify-center rounded border p-1 transition-all duration-200
+                    class={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full shadow-sm transition-all duration-300
                       ${isSolved
-                        ? 'border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] text-[rgb(34_197_94)]'
-                        : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)]'
+                        ? 'solved-button bg-[rgb(34_197_94)] text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]'
+                        : 'border border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(34_197_94)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)] hover:shadow-[0_0_5px_rgba(34,197,94,0.2)]'
                       } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
                     on:click={() => isAuthenticated && onToggleSolved(problem.id!, !isSolved)}
                     title={!isAuthenticated
@@ -248,7 +251,7 @@ function getDifficultyTooltip(problem: Problem): string {
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      class="stroke-2"
+                      class="checkmark-icon stroke-2"
                     >
                       <path d="M20 6 9 17l-5-5" />
                     </svg>
@@ -294,5 +297,32 @@ td:last-child {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   width: 100%;
+}
+
+/* Add subtle animation for solved problems */
+tr {
+  overflow: hidden;
+}
+
+/* Checkmark animation */
+.solved-button {
+  animation: pulse 1.5s infinite alternate;
+}
+
+.checkmark-icon {
+  transition: transform 0.3s ease;
+}
+
+.solved-button .checkmark-icon {
+  transform: scale(1.1);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 5px rgba(34, 197, 94, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+  }
 }
 </style>
