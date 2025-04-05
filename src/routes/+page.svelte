@@ -1,7 +1,13 @@
 <script lang="ts">
 import { onMount } from 'svelte';
 import { browser } from '$app/environment';
-import { fetchProblems, updateProblemFeedback, fetchUserFeedback } from '$lib/services/problem';
+import {
+  fetchProblems,
+  updateProblemFeedback,
+  fetchUserFeedback,
+  fetchUserSolvedProblems,
+  toggleProblemSolved
+} from '$lib/services/problem';
 import type { Problem } from '$lib/services/problem';
 import { user } from '$lib/services/auth';
 import ProblemTable from '$lib/components/ProblemTable.svelte';
@@ -12,6 +18,7 @@ let filteredProblems: Problem[] = [];
 let loading: boolean = false;
 let error: string | null = null;
 let userFeedback: Record<string, 'like' | 'dislike' | null> = {};
+let userSolvedProblems: Set<string> = new Set();
 let selectedTopic: string | null = null;
 let sidebarOpen = false; // Default closed on mobile
 let isMobile = false;
@@ -203,6 +210,40 @@ async function handleLike(problemId: string, isLike: boolean): Promise<void> {
   }
 }
 
+// Function to handle marking problems as solved/unsolved
+async function handleToggleSolved(problemId: string, isSolved: boolean): Promise<void> {
+  try {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      error = 'You must be signed in to mark problems as solved';
+      return;
+    }
+
+    // Update UI optimistically
+    if (isSolved) {
+      userSolvedProblems = new Set([...userSolvedProblems, problemId]);
+    } else {
+      userSolvedProblems = new Set([...userSolvedProblems].filter((id) => id !== problemId));
+    }
+
+    // Update the database
+    const success = await toggleProblemSolved(problemId, isSolved);
+
+    if (!success) {
+      // If there's an error, reload solved problems to ensure UI is in sync with server
+      if (isAuthenticated) {
+        userSolvedProblems = await fetchUserSolvedProblems();
+      }
+    }
+  } catch (err) {
+    console.error('Error updating solved status:', err);
+    // If there's an error, reload solved problems to ensure UI is in sync with server
+    if (isAuthenticated) {
+      userSolvedProblems = await fetchUserSolvedProblems();
+    }
+  }
+}
+
 // Function to load problems
 async function loadProblems() {
   loading = true;
@@ -218,9 +259,10 @@ async function loadProblems() {
     // Initialize filtered problems
     filteredProblems = [...problems];
 
-    // Load user feedback from database if authenticated
+    // Load user feedback and solved problems from database if authenticated
     if (isAuthenticated) {
       userFeedback = await fetchUserFeedback();
+      userSolvedProblems = await fetchUserSolvedProblems();
     }
   } catch (e) {
     console.error('Error loading problems:', e);
@@ -238,13 +280,17 @@ onMount(() => {
   const unsubscribe = user.subscribe((value) => {
     isAuthenticated = !!value;
 
-    // Reload user feedback when auth state changes
+    // Reload user feedback and solved problems when auth state changes
     if (isAuthenticated) {
       fetchUserFeedback().then((feedback) => {
         userFeedback = feedback;
       });
+      fetchUserSolvedProblems().then((solved) => {
+        userSolvedProblems = solved;
+      });
     } else {
       userFeedback = {};
+      userSolvedProblems = new Set();
     }
   });
 
@@ -315,7 +361,9 @@ onMount(() => {
             <ProblemTable
               problems={filteredProblems}
               userFeedback={userFeedback}
+              userSolvedProblems={userSolvedProblems}
               onLike={handleLike}
+              onToggleSolved={handleToggleSolved}
             />
           </div>
         </div>

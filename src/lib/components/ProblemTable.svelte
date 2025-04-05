@@ -8,7 +8,9 @@ const kattisLogo = '/images/kattis.png';
 // Props
 export let problems: Problem[] = [];
 export let userFeedback: Record<string, 'like' | 'dislike' | null> = {};
+export let userSolvedProblems: Set<string> = new Set();
 export let onLike: (problemId: string, isLike: boolean) => Promise<void>;
+export let onToggleSolved: (problemId: string, isSolved: boolean) => Promise<void>;
 
 // State
 let isAuthenticated = false;
@@ -82,7 +84,10 @@ function getDifficultyTooltip(problem: Problem): string {
       </thead>
       <tbody>
         {#each problems as problem}
-          <tr class="border-b border-[var(--color-border)] last:border-b-0 hover:bg-black/5">
+          <tr
+            class="border-b border-[var(--color-border)] last:border-b-0 hover:bg-black/5
+            ${problem.id && userSolvedProblems.has(problem.id) ? 'bg-[color-mix(in_oklab,rgb(34_197_94)_8%,transparent)]' : ''}"
+          >
             <td class="p-3 text-center">
               <span class="flex items-center justify-center">
                 <img
@@ -147,18 +152,20 @@ function getDifficultyTooltip(problem: Problem): string {
                 {#if problem.id}
                   {@const hasLiked = userFeedback[problem.id] === 'like'}
                   {@const hasDisliked = userFeedback[problem.id] === 'dislike'}
+                  {@const isSolved = userSolvedProblems.has(problem.id)}
 
+                  <!-- Like button -->
                   <button
                     class={`flex cursor-pointer items-center gap-1 rounded border px-2 py-1 transition-all duration-200
-                      ${hasLiked 
-                        ? 'border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] text-[rgb(34_197_94)]' 
+                      ${hasLiked
+                        ? 'border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] text-[rgb(34_197_94)]'
                         : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)]'
                       } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
                     on:click={() => isAuthenticated && onLike(problem.id!, true)}
-                    title={!isAuthenticated 
-                      ? 'Sign in to like problems' 
-                      : hasLiked 
-                        ? 'Undo like' 
+                    title={!isAuthenticated
+                      ? 'Sign in to like problems'
+                      : hasLiked
+                        ? 'Undo like'
                         : 'Like this problem'}
                     disabled={!isAuthenticated}
                   >
@@ -181,17 +188,18 @@ function getDifficultyTooltip(problem: Problem): string {
                     <span>{problem.likes}</span>
                   </button>
 
+                  <!-- Dislike button -->
                   <button
                     class={`flex cursor-pointer items-center gap-1 rounded border px-2 py-1 transition-all duration-200
-                      ${hasDisliked 
-                        ? 'border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] text-[rgb(239_68_68)]' 
+                      ${hasDisliked
+                        ? 'border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] text-[rgb(239_68_68)]'
                         : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] hover:text-[rgb(239_68_68)]'
                       } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
                     on:click={() => isAuthenticated && onLike(problem.id!, false)}
-                    title={!isAuthenticated 
-                      ? 'Sign in to dislike problems' 
-                      : hasDisliked 
-                        ? 'Undo dislike' 
+                    title={!isAuthenticated
+                      ? 'Sign in to dislike problems'
+                      : hasDisliked
+                        ? 'Undo dislike'
                         : 'Dislike this problem'}
                     disabled={!isAuthenticated}
                   >
@@ -212,6 +220,38 @@ function getDifficultyTooltip(problem: Problem): string {
                       ></path>
                     </svg>
                     <span>{problem.dislikes}</span>
+                  </button>
+
+                  <!-- Solved button -->
+                  <button
+                    class={`flex h-8 w-8 cursor-pointer items-center justify-center rounded border p-1 transition-all duration-200
+                      ${isSolved
+                        ? 'border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] text-[rgb(34_197_94)]'
+                        : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)]'
+                      } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
+                    on:click={() => isAuthenticated && onToggleSolved(problem.id!, !isSolved)}
+                    title={!isAuthenticated
+                      ? 'Sign in to mark problems as solved'
+                      : isSolved
+                        ? 'Mark as unsolved'
+                        : 'Mark as solved'}
+                    disabled={!isAuthenticated}
+                    aria-label={isSolved ? 'Mark as unsolved' : 'Mark as solved'}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="stroke-2"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
                   </button>
                 {/if}
               </div>

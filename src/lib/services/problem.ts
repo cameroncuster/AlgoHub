@@ -43,6 +43,16 @@ export type UserFeedback = {
 };
 
 /**
+ * User solved problem type
+ */
+export type UserSolvedProblem = {
+  id: string;
+  user_id: string;
+  problem_id: string;
+  solved_at: string;
+};
+
+/**
  * Determine the problem source based on URL
  */
 export function getProblemSource(url: string): 'codeforces' | 'kattis' {
@@ -218,6 +228,87 @@ export async function fetchUserFeedback(): Promise<Record<string, 'like' | 'disl
   } catch (err) {
     console.error('Failed to fetch user feedback:', err);
     return {};
+  }
+}
+
+/**
+ * Fetches user's solved problems
+ * @returns Set of solved problem IDs
+ */
+export async function fetchUserSolvedProblems(): Promise<Set<string>> {
+  const currentUser = get(user);
+
+  if (!currentUser) {
+    return new Set();
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('user_solved_problems')
+      .select('problem_id')
+      .eq('user_id', currentUser.id);
+
+    if (error) {
+      console.error('Error fetching user solved problems:', error);
+      return new Set();
+    }
+
+    return new Set(data.map((item) => item.problem_id));
+  } catch (err) {
+    console.error('Failed to fetch user solved problems:', err);
+    return new Set();
+  }
+}
+
+/**
+ * Marks a problem as solved or unsolved by the current user
+ * @param problemId - Problem ID
+ * @param isSolved - Whether to mark as solved (true) or unsolved (false)
+ * @returns Promise with success flag
+ */
+export async function toggleProblemSolved(problemId: string, isSolved: boolean): Promise<boolean> {
+  const currentUser = get(user);
+
+  if (!currentUser) {
+    console.error('Cannot update solved status: User not authenticated');
+    return false;
+  }
+
+  try {
+    if (isSolved) {
+      // Mark problem as solved
+      const { error } = await supabase.from('user_solved_problems').insert({
+        user_id: currentUser.id,
+        problem_id: problemId
+      });
+
+      if (error) {
+        // If the error is a duplicate key error, it means the problem is already marked as solved
+        if (error.code === '23505') {
+          // Postgres unique violation code
+          return true; // Already solved, so consider it a success
+        }
+        console.error(`Error marking problem ${problemId} as solved:`, error);
+        return false;
+      }
+    } else {
+      // Mark problem as unsolved (delete the record)
+      const { error } = await supabase
+        .from('user_solved_problems')
+        .delete()
+        .eq('user_id', currentUser.id)
+        .eq('problem_id', problemId);
+
+      if (error) {
+        console.error(`Error marking problem ${problemId} as unsolved:`, error);
+        return false;
+      }
+    }
+
+    return true;
+  } catch (err) {
+    console.error(`Failed to update solved status for problem ${problemId}:`, err);
+    return false;
   }
 }
 
