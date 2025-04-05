@@ -66,6 +66,8 @@ function getDifficultyTooltip(problem: Problem): string {
         <tr>
           <th class="sticky top-0 z-10 w-[5%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
           ></th>
+          <th class="sticky top-0 z-10 w-[5%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
+          ></th>
           <th class="sticky top-0 z-10 w-[25%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
             >Problem</th
           >
@@ -78,7 +80,7 @@ function getDifficultyTooltip(problem: Problem): string {
           <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
             >Added By</th
           >
-          <th class="sticky top-0 z-10 w-[25%] bg-[var(--color-tertiary)] p-3 text-right font-bold"
+          <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-right font-bold"
           ></th>
         </tr>
       </thead>
@@ -89,8 +91,42 @@ function getDifficultyTooltip(problem: Problem): string {
             ${problem.id && userSolvedProblems.has(problem.id)
               ? 'bg-[color-mix(in_oklab,rgb(34_197_94)_15%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_20%,transparent)]'
               : 'hover:bg-black/5'}"
-            style={problem.id && userSolvedProblems.has(problem.id) ? 'border-left: 4px solid rgb(34, 197, 94); box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.05);' : ''}
           >
+            <td class="p-3 text-center">
+              {#if problem.id}
+                {@const isSolved = userSolvedProblems.has(problem.id)}
+                <button
+                  class={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full shadow-sm transition-all duration-300
+                    ${isSolved
+                      ? 'solved-button bg-[rgb(34_197_94)] text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]'
+                      : 'border border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(34_197_94)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)] hover:shadow-[0_0_5px_rgba(34,197,94,0.2)]'
+                    } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
+                  on:click={() => isAuthenticated && onToggleSolved(problem.id!, !isSolved)}
+                  title={!isAuthenticated
+                    ? 'Sign in to mark problems as solved'
+                    : isSolved
+                      ? 'Mark as unsolved'
+                      : 'Mark as solved'}
+                  disabled={!isAuthenticated}
+                  aria-label={isSolved ? 'Mark as unsolved' : 'Mark as solved'}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="checkmark-icon stroke-2"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </button>
+              {/if}
+            </td>
             <td class="p-3 text-center">
               <span class="flex items-center justify-center">
                 <img
@@ -155,7 +191,6 @@ function getDifficultyTooltip(problem: Problem): string {
                 {#if problem.id}
                   {@const hasLiked = userFeedback[problem.id] === 'like'}
                   {@const hasDisliked = userFeedback[problem.id] === 'dislike'}
-                  {@const isSolved = userSolvedProblems.has(problem.id)}
 
                   <!-- Like button -->
                   <button
@@ -223,38 +258,6 @@ function getDifficultyTooltip(problem: Problem): string {
                       ></path>
                     </svg>
                     <span>{problem.dislikes}</span>
-                  </button>
-
-                  <!-- Solved button -->
-                  <button
-                    class={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full shadow-sm transition-all duration-300
-                      ${isSolved
-                        ? 'solved-button bg-[rgb(34_197_94)] text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]'
-                        : 'border border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(34_197_94)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)] hover:shadow-[0_0_5px_rgba(34,197,94,0.2)]'
-                      } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
-                    on:click={() => isAuthenticated && onToggleSolved(problem.id!, !isSolved)}
-                    title={!isAuthenticated
-                      ? 'Sign in to mark problems as solved'
-                      : isSolved
-                        ? 'Mark as unsolved'
-                        : 'Mark as solved'}
-                    disabled={!isAuthenticated}
-                    aria-label={isSolved ? 'Mark as unsolved' : 'Mark as solved'}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="checkmark-icon stroke-2"
-                    >
-                      <path d="M20 6 9 17l-5-5" />
-                    </svg>
                   </button>
                 {/if}
               </div>
