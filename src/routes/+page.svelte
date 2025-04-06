@@ -20,9 +20,13 @@ let error: string | null = null;
 let userFeedback: Record<string, 'like' | 'dislike' | null> = {};
 let userSolvedProblems: Set<string> = new Set();
 let selectedTopic: string | null = null;
+let selectedAuthor: string | null = null;
+let selectedSource: 'codeforces' | 'kattis' | null = null;
+let solvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
 let sidebarOpen = false; // Default closed on mobile
 let isMobile = false;
 let isAuthenticated = false;
+let availableAuthors: string[] = [];
 
 // Problem types
 const PROBLEM_TYPES = ['graph', 'array', 'string', 'math', 'tree', 'queries', 'geometry', 'misc'];
@@ -64,19 +68,74 @@ function sortProblemsByScore(problemsToSort: Problem[]): Problem[] {
   return scores.flatMap((score) => problemsByScore[score]);
 }
 
-// Function to filter problems by topic
-function filterProblemsByTopic(topic: string | null): void {
-  if (!topic) {
-    filteredProblems = [...problems];
-  } else {
-    filteredProblems = problems.filter((problem) => {
+// Function to sort problems by difficulty
+function sortProblemsByDifficulty(
+  problemsToSort: Problem[],
+  direction: 'asc' | 'desc' | null
+): Problem[] {
+  if (direction === null) {
+    // If no direction specified, return to default sort (by score)
+    return sortProblemsByScore([...problemsToSort]);
+  }
+
+  return [...problemsToSort].sort((a, b) => {
+    // Handle undefined difficulties
+    const diffA = a.difficulty ?? 0;
+    const diffB = b.difficulty ?? 0;
+
+    // Sort based on direction
+    return direction === 'asc' ? diffA - diffB : diffB - diffA;
+  });
+}
+
+// Filter states
+
+// Function to get problems filtered by everything except author
+function getProblemsWithoutAuthorFilter(): Problem[] {
+  let filtered = [...problems];
+
+  // Apply topic filter if selected
+  if (selectedTopic) {
+    filtered = filtered.filter((problem) => {
       // If topic is "misc", include problems with no type or with "misc" type
-      if (topic === 'misc') {
+      if (selectedTopic === 'misc') {
         return !problem.type || problem.type === 'misc';
       }
-      return problem.type === topic;
+      return problem.type === selectedTopic;
     });
   }
+
+  // Apply solved filter if not 'all'
+  if (solvedFilterState !== 'all') {
+    filtered = filtered.filter((problem) => {
+      const isSolved = problem.id && userSolvedProblems.has(problem.id);
+      return solvedFilterState === 'solved' ? isSolved : !isSolved;
+    });
+  }
+
+  // Apply source filter if selected
+  if (selectedSource) {
+    filtered = filtered.filter((problem) => problem.source === selectedSource);
+  }
+
+  return filtered;
+}
+
+// Function to filter problems by topic, solved status, and author
+function filterProblems(): void {
+  // Get problems filtered by everything except author
+  let filtered = getProblemsWithoutAuthorFilter();
+
+  // Update available authors based on current filters (except author filter)
+  availableAuthors = [...new Set(filtered.map((p) => p.addedBy))].sort();
+
+  // Apply author filter if selected
+  if (selectedAuthor) {
+    filtered = filtered.filter((problem) => problem.addedBy === selectedAuthor);
+  }
+
+  // Update filtered problems
+  filteredProblems = filtered;
 
   // Auto-close sidebar on mobile after selection
   if (isMobile) {
@@ -84,9 +143,14 @@ function filterProblemsByTopic(topic: string | null): void {
   }
 }
 
+// Function to filter problems by topic
+function filterProblemsByTopic(topic: string | null): void {
+  selectedTopic = topic;
+  filterProblems();
+}
+
 // Function to handle topic selection
 function handleTopicSelect(topic: string | null): void {
-  selectedTopic = topic;
   filterProblemsByTopic(topic);
 }
 
@@ -137,7 +201,7 @@ async function handleLike(problemId: string, isLike: boolean): Promise<void> {
       await updateProblemFeedback(problemId, isLike, true);
 
       // Update filtered problems
-      filterProblemsByTopic(selectedTopic);
+      filterProblems();
       return;
     }
 
@@ -175,7 +239,7 @@ async function handleLike(problemId: string, isLike: boolean): Promise<void> {
       await updateProblemFeedback(problemId, isLike, false, currentFeedback);
 
       // Update filtered problems
-      filterProblemsByTopic(selectedTopic);
+      filterProblems();
       return;
     }
 
@@ -202,7 +266,7 @@ async function handleLike(problemId: string, isLike: boolean): Promise<void> {
     await updateProblemFeedback(problemId, isLike);
 
     // Update filtered problems
-    filterProblemsByTopic(selectedTopic);
+    filterProblems();
   } catch (err) {
     console.error('Error updating feedback:', err);
     // If there's an error, reload problems to ensure UI is in sync with server
@@ -244,6 +308,36 @@ async function handleToggleSolved(problemId: string, isSolved: boolean): Promise
   }
 }
 
+// Function to handle difficulty sorting
+function handleDifficultySort({ detail }: CustomEvent<{ direction: 'asc' | 'desc' | null }>) {
+  // Get problems with all filters except author
+  const problemsWithoutAuthorFilter = getProblemsWithoutAuthorFilter();
+
+  // Update available authors
+  availableAuthors = [...new Set(problemsWithoutAuthorFilter.map((p) => p.addedBy))].sort();
+
+  // Sort the problems by difficulty
+  filteredProblems = sortProblemsByDifficulty(filteredProblems, detail.direction);
+}
+
+// Function to handle solved filter
+function handleSolvedFilter({ detail }: CustomEvent<{ state: 'all' | 'solved' | 'unsolved' }>) {
+  solvedFilterState = detail.state;
+  filterProblems();
+}
+
+// Function to handle author filter
+function handleAuthorFilter({ detail }: CustomEvent<{ author: string | null }>) {
+  selectedAuthor = detail.author;
+  filterProblems();
+}
+
+// Function to handle source filter
+function handleSourceFilter({ detail }: CustomEvent<{ source: 'codeforces' | 'kattis' | null }>) {
+  selectedSource = detail.source;
+  filterProblems();
+}
+
 // Function to load problems
 async function loadProblems() {
   loading = true;
@@ -256,8 +350,11 @@ async function loadProblems() {
     // Sort by score only on initial load
     problems = sortProblemsByScore(fetchedProblems);
 
-    // Initialize filtered problems
-    filteredProblems = [...problems];
+    // Initialize available authors with all authors
+    availableAuthors = [...new Set(problems.map((p) => p.addedBy))].sort();
+
+    // Initialize filtered problems using our filter function
+    filterProblems();
 
     // Load user feedback and solved problems from database if authenticated
     if (isAuthenticated) {
@@ -362,8 +459,13 @@ onMount(() => {
               problems={filteredProblems}
               userFeedback={userFeedback}
               userSolvedProblems={userSolvedProblems}
+              allAuthors={availableAuthors}
               onLike={handleLike}
               onToggleSolved={handleToggleSolved}
+              on:sortDifficulty={handleDifficultySort}
+              on:filterSolved={handleSolvedFilter}
+              on:filterAuthor={handleAuthorFilter}
+              on:filterSource={handleSourceFilter}
             />
           </div>
         </div>

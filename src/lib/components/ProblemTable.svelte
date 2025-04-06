@@ -1,9 +1,13 @@
 <script lang="ts">
 import type { Problem } from '$lib/services/problem';
 import { user } from '$lib/services/auth';
+import { createEventDispatcher } from 'svelte';
 // Use static image paths instead of imports
 const codeforcesLogo = '/images/codeforces.png';
 const kattisLogo = '/images/kattis.png';
+
+// Event dispatcher
+const dispatch = createEventDispatcher();
 
 // Props
 export let problems: Problem[] = [];
@@ -14,11 +18,82 @@ export let onToggleSolved: (problemId: string, isSolved: boolean) => Promise<voi
 
 // State
 let isAuthenticated = false;
+let difficultySortDirection: 'asc' | 'desc' | null = null;
+let solvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
+let authorFilterValue: string | null = null;
+let sourceFilterValue: 'all' | 'codeforces' | 'kattis' = 'all';
+let uniqueAuthors: string[] = [];
 
 // Subscribe to auth state
 user.subscribe((value) => {
   isAuthenticated = !!value;
 });
+
+// We need to get all authors from the parent component
+export let allAuthors: string[] = [];
+
+// If allAuthors is not provided, fall back to extracting from current problems
+$: {
+  if (allAuthors.length === 0) {
+    uniqueAuthors = [...new Set(problems.map((p) => p.addedBy))].sort();
+  } else {
+    uniqueAuthors = [...allAuthors].sort();
+  }
+}
+
+// Function to handle difficulty column click
+function handleDifficultySort() {
+  // Toggle sort direction: null -> asc -> desc -> null
+  if (difficultySortDirection === null) {
+    difficultySortDirection = 'asc';
+  } else if (difficultySortDirection === 'asc') {
+    difficultySortDirection = 'desc';
+  } else {
+    difficultySortDirection = null;
+  }
+
+  // Dispatch event to parent component
+  dispatch('sortDifficulty', { direction: difficultySortDirection });
+}
+
+// Function to handle solved filter click
+function handleSolvedFilter() {
+  // Toggle filter state: all -> solved -> unsolved -> all
+  if (solvedFilterState === 'all') {
+    solvedFilterState = 'solved';
+  } else if (solvedFilterState === 'solved') {
+    solvedFilterState = 'unsolved';
+  } else {
+    solvedFilterState = 'all';
+  }
+
+  // Dispatch event to parent component
+  dispatch('filterSolved', { state: solvedFilterState });
+}
+
+// Function to handle author filter change
+function handleAuthorFilter(event: Event) {
+  const select = event.target as HTMLSelectElement;
+  authorFilterValue = select.value === 'all' ? null : select.value;
+
+  // Dispatch event to parent component
+  dispatch('filterAuthor', { author: authorFilterValue });
+}
+
+// Function to handle source filter click
+function handleSourceFilter() {
+  // Toggle filter state: all -> codeforces -> kattis -> all
+  if (sourceFilterValue === 'all') {
+    sourceFilterValue = 'codeforces';
+  } else if (sourceFilterValue === 'codeforces') {
+    sourceFilterValue = 'kattis';
+  } else {
+    sourceFilterValue = 'all';
+  }
+
+  // Dispatch event to parent component
+  dispatch('filterSource', { source: sourceFilterValue === 'all' ? null : sourceFilterValue });
+}
 
 // Define common tiers
 const TIERS = [
@@ -64,22 +139,182 @@ function getDifficultyTooltip(problem: Problem): string {
     >
       <thead>
         <tr>
-          <th class="sticky top-0 z-10 w-[5%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
-          ></th>
-          <th class="sticky top-0 z-10 w-[5%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
-          ></th>
+          <th
+            class="sticky top-0 z-10 w-[5%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            on:click={handleSolvedFilter}
+            title="Filter by solved status"
+          >
+            <div class="flex items-center justify-center gap-1">
+              {#if solvedFilterState === 'solved'}
+                <span class="text-sm font-bold text-[rgb(34_197_94)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </span>
+              {:else if solvedFilterState === 'unsolved'}
+                <span class="text-sm font-bold text-[rgb(239_68_68)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </span>
+              {:else}
+                <span class="text-sm font-bold text-[var(--color-text-muted)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M22 12h-4" />
+                    <path d="M6 12H2" />
+                    <path d="M12 6v4" />
+                    <path d="M12 14v4" />
+                  </svg>
+                </span>
+              {/if}
+            </div>
+          </th>
+          <th
+            class="sticky top-0 z-10 w-[5%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            on:click={handleSourceFilter}
+            title="Filter by source"
+          >
+            <div class="flex items-center justify-center gap-1">
+              {#if sourceFilterValue === 'codeforces'}
+                <span class="text-sm font-bold text-[#3B5998]">
+                  <img src={codeforcesLogo} alt="Codeforces" class="h-5 w-5 object-contain" />
+                </span>
+              {:else if sourceFilterValue === 'kattis'}
+                <span class="text-sm font-bold text-[#f2ae00]">
+                  <img src={kattisLogo} alt="Kattis" class="h-5 w-5 object-contain" />
+                </span>
+              {:else}
+                <span class="text-sm font-bold text-[var(--color-text-muted)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path>
+                    <path d="M3 12h6"></path>
+                    <path d="M15 12h6"></path>
+                  </svg>
+                </span>
+              {/if}
+            </div>
+          </th>
           <th class="sticky top-0 z-10 w-[25%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
             >Problem</th
           >
-          <th class="sticky top-0 z-10 w-[10%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
-            >Difficulty</th
+          <th
+            class="sticky top-0 z-10 w-[10%] cursor-pointer bg-[var(--color-tertiary)] p-3 py-4 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            on:click={handleDifficultySort}
+            title="Click to sort by difficulty"
           >
+            <div class="flex items-center justify-center gap-2">
+              {#if difficultySortDirection === 'asc'}
+                <span class="text-sm font-bold text-[var(--color-accent)]">▲</span>
+              {:else if difficultySortDirection === 'desc'}
+                <span class="text-sm font-bold text-[var(--color-accent)]">▼</span>
+              {:else}
+                <span
+                  class="flex flex-col text-sm leading-[1] font-bold text-[var(--color-text-muted)]"
+                >
+                  <span>▲</span>
+                  <span>▼</span>
+                </span>
+              {/if}
+              <span class="font-bold">Difficulty</span>
+            </div>
+          </th>
           <th class="sticky top-0 z-10 w-[10%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
             >Topic</th
           >
-          <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
-            >Added By</th
-          >
+          <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+            <div class="flex items-center gap-2">
+              <div class="relative w-full">
+                <div class="pointer-events-none absolute inset-y-0 left-2 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-[var(--color-text-muted)]"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <select
+                  class="focus:ring-opacity-20 w-full appearance-none rounded-md border py-1.5 pr-8 pl-9 text-sm shadow-sm transition-all duration-200 hover:border-[var(--color-accent-muted)] focus:border-[var(--color-accent)] focus:ring focus:ring-[var(--color-accent)] focus:outline-none ${authorFilterValue ? 'border-[var(--color-accent)] bg-[color-mix(in_oklab,var(--color-accent)_10%,var(--color-secondary))] text-[var(--color-accent)]' : 'border-[var(--color-border)] bg-[var(--color-secondary)] text-[var(--color-text)]'}"
+                  on:change={handleAuthorFilter}
+                  aria-label="Filter by author"
+                  value={authorFilterValue || 'all'}
+                >
+                  <option value="all">All recommenders</option>
+                  <option value="all" disabled>──────────</option>
+                  {#each uniqueAuthors as author}
+                    <option value={author} style="color: var(--color-username);">@{author}</option>
+                  {/each}
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-[var(--color-text-muted)]"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </th>
           <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-right font-bold"
           ></th>
         </tr>
@@ -89,7 +324,7 @@ function getDifficultyTooltip(problem: Problem): string {
           <tr
             class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0
             ${problem.id && userSolvedProblems.has(problem.id)
-              ? 'bg-[color-mix(in_oklab,rgb(34_197_94)_15%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_20%,transparent)]'
+              ? 'border-l-4 border-l-[rgb(34_197_94)] bg-[var(--color-solved-row)]'
               : 'hover:bg-black/5'}"
           >
             <td class="p-3 text-center">
@@ -180,7 +415,7 @@ function getDifficultyTooltip(problem: Problem): string {
                 href={problem.addedByUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-[var(--color-text)] hover:text-[var(--color-accent)] hover:underline"
+                class="text-[var(--color-username)] hover:text-[color-mix(in_oklab,var(--color-username)_80%,white)] hover:underline"
                 title={"@" + problem.addedBy}
               >
                 @{problem.addedBy}
@@ -318,6 +553,35 @@ tr {
 
 .solved-button .checkmark-icon {
   transform: scale(1.1);
+}
+
+/* Sortable header styles */
+th {
+  transition: background-color 0.2s ease;
+}
+
+/* Custom select styling */
+select {
+  cursor: pointer;
+  background-image: none; /* Remove default arrow */
+}
+
+select:focus + div svg {
+  color: var(--color-accent);
+}
+
+/* Hover effect for select */
+select:hover {
+  border-color: var(--color-accent-muted);
+}
+
+/* Ensure username is always purple */
+a[href*='github.com'] {
+  color: var(--color-username) !important;
+}
+
+a[href*='github.com']:hover {
+  color: color-mix(in oklab, var(--color-username) 80%, white) !important;
 }
 
 @keyframes pulse {
