@@ -64,6 +64,26 @@ function sortProblemsByScore(problemsToSort: Problem[]): Problem[] {
   return scores.flatMap((score) => problemsByScore[score]);
 }
 
+// Function to sort problems by difficulty
+function sortProblemsByDifficulty(
+  problemsToSort: Problem[],
+  direction: 'asc' | 'desc' | null
+): Problem[] {
+  if (direction === null) {
+    // If no direction specified, return to default sort (by score)
+    return sortProblemsByScore([...problemsToSort]);
+  }
+
+  return [...problemsToSort].sort((a, b) => {
+    // Handle undefined difficulties
+    const diffA = a.difficulty ?? 0;
+    const diffB = b.difficulty ?? 0;
+
+    // Sort based on direction
+    return direction === 'asc' ? diffA - diffB : diffB - diffA;
+  });
+}
+
 // Function to filter problems by topic
 function filterProblemsByTopic(topic: string | null): void {
   if (!topic) {
@@ -244,6 +264,12 @@ async function handleToggleSolved(problemId: string, isSolved: boolean): Promise
   }
 }
 
+// Function to handle difficulty sorting
+function handleDifficultySort({ detail }: CustomEvent<{ direction: 'asc' | 'desc' | null }>) {
+  // Sort the problems by difficulty
+  filteredProblems = sortProblemsByDifficulty(filteredProblems, detail.direction);
+}
+
 // Function to load problems
 async function loadProblems() {
   loading = true;
@@ -364,6 +390,7 @@ onMount(() => {
               userSolvedProblems={userSolvedProblems}
               onLike={handleLike}
               onToggleSolved={handleToggleSolved}
+              on:sortDifficulty={handleDifficultySort}
             />
           </div>
         </div>

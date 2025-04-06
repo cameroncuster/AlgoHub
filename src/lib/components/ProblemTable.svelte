@@ -1,9 +1,13 @@
 <script lang="ts">
 import type { Problem } from '$lib/services/problem';
 import { user } from '$lib/services/auth';
+import { createEventDispatcher } from 'svelte';
 // Use static image paths instead of imports
 const codeforcesLogo = '/images/codeforces.png';
 const kattisLogo = '/images/kattis.png';
+
+// Event dispatcher
+const dispatch = createEventDispatcher();
 
 // Props
 export let problems: Problem[] = [];
@@ -14,11 +18,27 @@ export let onToggleSolved: (problemId: string, isSolved: boolean) => Promise<voi
 
 // State
 let isAuthenticated = false;
+let difficultySortDirection: 'asc' | 'desc' | null = null;
 
 // Subscribe to auth state
 user.subscribe((value) => {
   isAuthenticated = !!value;
 });
+
+// Function to handle difficulty column click
+function handleDifficultySort() {
+  // Toggle sort direction: null -> asc -> desc -> null
+  if (difficultySortDirection === null) {
+    difficultySortDirection = 'asc';
+  } else if (difficultySortDirection === 'asc') {
+    difficultySortDirection = 'desc';
+  } else {
+    difficultySortDirection = null;
+  }
+
+  // Dispatch event to parent component
+  dispatch('sortDifficulty', { direction: difficultySortDirection });
+}
 
 // Define common tiers
 const TIERS = [
@@ -71,9 +91,27 @@ function getDifficultyTooltip(problem: Problem): string {
           <th class="sticky top-0 z-10 w-[25%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
             >Problem</th
           >
-          <th class="sticky top-0 z-10 w-[10%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
-            >Difficulty</th
+          <th
+            class="sticky top-0 z-10 w-[10%] cursor-pointer bg-[var(--color-tertiary)] p-3 py-4 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            on:click={handleDifficultySort}
+            title="Click to sort by difficulty"
           >
+            <div class="flex items-center justify-center gap-2">
+              {#if difficultySortDirection === 'asc'}
+                <span class="text-sm font-bold text-[var(--color-accent)]">▲</span>
+              {:else if difficultySortDirection === 'desc'}
+                <span class="text-sm font-bold text-[var(--color-accent)]">▼</span>
+              {:else}
+                <span
+                  class="flex flex-col text-sm leading-[1] font-bold text-[var(--color-text-muted)]"
+                >
+                  <span>▲</span>
+                  <span>▼</span>
+                </span>
+              {/if}
+              <span class="font-bold">Difficulty</span>
+            </div>
+          </th>
           <th class="sticky top-0 z-10 w-[10%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
             >Topic</th
           >
@@ -318,6 +356,11 @@ tr {
 
 .solved-button .checkmark-icon {
   transform: scale(1.1);
+}
+
+/* Sortable header styles */
+th {
+  transition: background-color 0.2s ease;
 }
 
 @keyframes pulse {
