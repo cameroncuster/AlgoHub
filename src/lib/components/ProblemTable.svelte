@@ -19,6 +19,7 @@ export let onToggleSolved: (problemId: string, isSolved: boolean) => Promise<voi
 // State
 let isAuthenticated = false;
 let difficultySortDirection: 'asc' | 'desc' | null = null;
+let solvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
 
 // Subscribe to auth state
 user.subscribe((value) => {
@@ -38,6 +39,21 @@ function handleDifficultySort() {
 
   // Dispatch event to parent component
   dispatch('sortDifficulty', { direction: difficultySortDirection });
+}
+
+// Function to handle solved filter click
+function handleSolvedFilter() {
+  // Toggle filter state: all -> solved -> unsolved -> all
+  if (solvedFilterState === 'all') {
+    solvedFilterState = 'solved';
+  } else if (solvedFilterState === 'solved') {
+    solvedFilterState = 'unsolved';
+  } else {
+    solvedFilterState = 'all';
+  }
+
+  // Dispatch event to parent component
+  dispatch('filterSolved', { state: solvedFilterState });
 }
 
 // Define common tiers
@@ -84,8 +100,67 @@ function getDifficultyTooltip(problem: Problem): string {
     >
       <thead>
         <tr>
-          <th class="sticky top-0 z-10 w-[5%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
-          ></th>
+          <th
+            class="sticky top-0 z-10 w-[5%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            on:click={handleSolvedFilter}
+            title="Filter by solved status"
+          >
+            <div class="flex items-center justify-center gap-1">
+              {#if solvedFilterState === 'solved'}
+                <span class="text-sm font-bold text-[rgb(34_197_94)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </span>
+              {:else if solvedFilterState === 'unsolved'}
+                <span class="text-sm font-bold text-[rgb(239_68_68)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </span>
+              {:else}
+                <span class="text-sm font-bold text-[var(--color-text-muted)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M22 12h-4" />
+                    <path d="M6 12H2" />
+                    <path d="M12 6v4" />
+                    <path d="M12 14v4" />
+                  </svg>
+                </span>
+              {/if}
+            </div>
+          </th>
           <th class="sticky top-0 z-10 w-[5%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
           ></th>
           <th class="sticky top-0 z-10 w-[25%] bg-[var(--color-tertiary)] p-3 text-left font-bold"

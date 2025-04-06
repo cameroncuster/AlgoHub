@@ -84,19 +84,35 @@ function sortProblemsByDifficulty(
   });
 }
 
-// Function to filter problems by topic
-function filterProblemsByTopic(topic: string | null): void {
-  if (!topic) {
-    filteredProblems = [...problems];
-  } else {
-    filteredProblems = problems.filter((problem) => {
+// Current solved filter state
+let solvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
+
+// Function to filter problems by topic and solved status
+function filterProblems(): void {
+  // Start with all problems
+  let filtered = [...problems];
+
+  // Apply topic filter if selected
+  if (selectedTopic) {
+    filtered = filtered.filter((problem) => {
       // If topic is "misc", include problems with no type or with "misc" type
-      if (topic === 'misc') {
+      if (selectedTopic === 'misc') {
         return !problem.type || problem.type === 'misc';
       }
-      return problem.type === topic;
+      return problem.type === selectedTopic;
     });
   }
+
+  // Apply solved filter if not 'all'
+  if (solvedFilterState !== 'all') {
+    filtered = filtered.filter((problem) => {
+      const isSolved = problem.id && userSolvedProblems.has(problem.id);
+      return solvedFilterState === 'solved' ? isSolved : !isSolved;
+    });
+  }
+
+  // Update filtered problems
+  filteredProblems = filtered;
 
   // Auto-close sidebar on mobile after selection
   if (isMobile) {
@@ -104,9 +120,14 @@ function filterProblemsByTopic(topic: string | null): void {
   }
 }
 
+// Function to filter problems by topic
+function filterProblemsByTopic(topic: string | null): void {
+  selectedTopic = topic;
+  filterProblems();
+}
+
 // Function to handle topic selection
 function handleTopicSelect(topic: string | null): void {
-  selectedTopic = topic;
   filterProblemsByTopic(topic);
 }
 
@@ -157,7 +178,7 @@ async function handleLike(problemId: string, isLike: boolean): Promise<void> {
       await updateProblemFeedback(problemId, isLike, true);
 
       // Update filtered problems
-      filterProblemsByTopic(selectedTopic);
+      filterProblems();
       return;
     }
 
@@ -195,7 +216,7 @@ async function handleLike(problemId: string, isLike: boolean): Promise<void> {
       await updateProblemFeedback(problemId, isLike, false, currentFeedback);
 
       // Update filtered problems
-      filterProblemsByTopic(selectedTopic);
+      filterProblems();
       return;
     }
 
@@ -222,7 +243,7 @@ async function handleLike(problemId: string, isLike: boolean): Promise<void> {
     await updateProblemFeedback(problemId, isLike);
 
     // Update filtered problems
-    filterProblemsByTopic(selectedTopic);
+    filterProblems();
   } catch (err) {
     console.error('Error updating feedback:', err);
     // If there's an error, reload problems to ensure UI is in sync with server
@@ -270,6 +291,12 @@ function handleDifficultySort({ detail }: CustomEvent<{ direction: 'asc' | 'desc
   filteredProblems = sortProblemsByDifficulty(filteredProblems, detail.direction);
 }
 
+// Function to handle solved filter
+function handleSolvedFilter({ detail }: CustomEvent<{ state: 'all' | 'solved' | 'unsolved' }>) {
+  solvedFilterState = detail.state;
+  filterProblems();
+}
+
 // Function to load problems
 async function loadProblems() {
   loading = true;
@@ -282,8 +309,8 @@ async function loadProblems() {
     // Sort by score only on initial load
     problems = sortProblemsByScore(fetchedProblems);
 
-    // Initialize filtered problems
-    filteredProblems = [...problems];
+    // Initialize filtered problems using our filter function
+    filterProblems();
 
     // Load user feedback and solved problems from database if authenticated
     if (isAuthenticated) {
@@ -391,6 +418,7 @@ onMount(() => {
               onLike={handleLike}
               onToggleSolved={handleToggleSolved}
               on:sortDifficulty={handleDifficultySort}
+              on:filterSolved={handleSolvedFilter}
             />
           </div>
         </div>
