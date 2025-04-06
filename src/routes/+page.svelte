@@ -20,6 +20,9 @@ let error: string | null = null;
 let userFeedback: Record<string, 'like' | 'dislike' | null> = {};
 let userSolvedProblems: Set<string> = new Set();
 let selectedTopic: string | null = null;
+let selectedAuthor: string | null = null;
+let selectedSource: 'codeforces' | 'kattis' | null = null;
+let solvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
 let sidebarOpen = false; // Default closed on mobile
 let isMobile = false;
 let isAuthenticated = false;
@@ -86,8 +89,6 @@ function sortProblemsByDifficulty(
 }
 
 // Filter states
-let solvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
-let selectedAuthor: string | null = null;
 
 // Function to get problems filtered by everything except author
 function getProblemsWithoutAuthorFilter(): Problem[] {
@@ -110,6 +111,11 @@ function getProblemsWithoutAuthorFilter(): Problem[] {
       const isSolved = problem.id && userSolvedProblems.has(problem.id);
       return solvedFilterState === 'solved' ? isSolved : !isSolved;
     });
+  }
+
+  // Apply source filter if selected
+  if (selectedSource) {
+    filtered = filtered.filter((problem) => problem.source === selectedSource);
   }
 
   return filtered;
@@ -326,6 +332,12 @@ function handleAuthorFilter({ detail }: CustomEvent<{ author: string | null }>) 
   filterProblems();
 }
 
+// Function to handle source filter
+function handleSourceFilter({ detail }: CustomEvent<{ source: 'codeforces' | 'kattis' | null }>) {
+  selectedSource = detail.source;
+  filterProblems();
+}
+
 // Function to load problems
 async function loadProblems() {
   loading = true;
@@ -453,6 +465,7 @@ onMount(() => {
               on:sortDifficulty={handleDifficultySort}
               on:filterSolved={handleSolvedFilter}
               on:filterAuthor={handleAuthorFilter}
+              on:filterSource={handleSourceFilter}
             />
           </div>
         </div>

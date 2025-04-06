@@ -21,6 +21,7 @@ let isAuthenticated = false;
 let difficultySortDirection: 'asc' | 'desc' | null = null;
 let solvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
 let authorFilterValue: string | null = null;
+let sourceFilterValue: 'all' | 'codeforces' | 'kattis' = 'all';
 let uniqueAuthors: string[] = [];
 
 // Subscribe to auth state
@@ -77,6 +78,21 @@ function handleAuthorFilter(event: Event) {
 
   // Dispatch event to parent component
   dispatch('filterAuthor', { author: authorFilterValue });
+}
+
+// Function to handle source filter click
+function handleSourceFilter() {
+  // Toggle filter state: all -> codeforces -> kattis -> all
+  if (sourceFilterValue === 'all') {
+    sourceFilterValue = 'codeforces';
+  } else if (sourceFilterValue === 'codeforces') {
+    sourceFilterValue = 'kattis';
+  } else {
+    sourceFilterValue = 'all';
+  }
+
+  // Dispatch event to parent component
+  dispatch('filterSource', { source: sourceFilterValue === 'all' ? null : sourceFilterValue });
 }
 
 // Define common tiers
@@ -184,8 +200,41 @@ function getDifficultyTooltip(problem: Problem): string {
               {/if}
             </div>
           </th>
-          <th class="sticky top-0 z-10 w-[5%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
-          ></th>
+          <th
+            class="sticky top-0 z-10 w-[5%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            on:click={handleSourceFilter}
+            title="Filter by source"
+          >
+            <div class="flex items-center justify-center gap-1">
+              {#if sourceFilterValue === 'codeforces'}
+                <span class="text-sm font-bold text-[#3B5998]">
+                  <img src={codeforcesLogo} alt="Codeforces" class="h-5 w-5 object-contain" />
+                </span>
+              {:else if sourceFilterValue === 'kattis'}
+                <span class="text-sm font-bold text-[#f2ae00]">
+                  <img src={kattisLogo} alt="Kattis" class="h-5 w-5 object-contain" />
+                </span>
+              {:else}
+                <span class="text-sm font-bold text-[var(--color-text-muted)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path>
+                    <path d="M3 12h6"></path>
+                    <path d="M15 12h6"></path>
+                  </svg>
+                </span>
+              {/if}
+            </div>
+          </th>
           <th class="sticky top-0 z-10 w-[25%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
             >Problem</th
           >
