@@ -25,6 +25,12 @@
     --color-link: oklch(0.65 0.26 296.88);
     --color-link-subtle: oklch(0.8 0.1 296.88);
     --color-link-nav: oklch(1 0 0 / 0.8);
+    --color-username: oklch(0.65 0.26 296.88); /* Purple color for usernames */
+    --color-solved-row: color-mix(
+      in oklab,
+      rgb(34 197 94) 15%,
+      transparent
+    ); /* Light green for solved rows */
 
     /* Codeforces rating colors */
     --color-legendary-grandmaster: oklch(0.65 0.27 29.23);
@@ -143,14 +149,16 @@ table a {
 /* User links in tables - keep them purple */
 .table a[href*='github.com'],
 table a[href*='github.com'],
-table td:nth-child(5) a {
-  color: var(--color-accent);
+table td:nth-child(5) a,
+table td:nth-child(6) a {
+  color: var(--color-username);
 }
 
 .table a[href*='github.com']:hover,
 table a[href*='github.com']:hover,
-table td:nth-child(5) a:hover {
-  color: color-mix(in oklab, var(--color-accent) 80%, white);
+table td:nth-child(5) a:hover,
+table td:nth-child(6) a:hover {
+  color: color-mix(in oklab, var(--color-username) 80%, white);
 }
 
 .table a:hover,

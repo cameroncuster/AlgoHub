@@ -244,7 +244,7 @@ function getDifficultyTooltip(problem: Problem): string {
                   <option value="all">All recommenders</option>
                   <option value="all" disabled>──────────</option>
                   {#each uniqueAuthors as author}
-                    <option value={author}>@{author}</option>
+                    <option value={author} style="color: var(--color-username);">@{author}</option>
                   {/each}
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
@@ -275,7 +275,7 @@ function getDifficultyTooltip(problem: Problem): string {
           <tr
             class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0
             ${problem.id && userSolvedProblems.has(problem.id)
-              ? 'bg-[color-mix(in_oklab,rgb(34_197_94)_25%,transparent)]'
+              ? 'border-l-4 border-l-[rgb(34_197_94)] bg-[var(--color-solved-row)]'
               : 'hover:bg-black/5'}"
           >
             <td class="p-3 text-center">
@@ -366,7 +366,7 @@ function getDifficultyTooltip(problem: Problem): string {
                 href={problem.addedByUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-[var(--color-text)] hover:text-[var(--color-accent)] hover:underline"
+                class="text-[var(--color-username)] hover:text-[color-mix(in_oklab,var(--color-username)_80%,white)] hover:underline"
                 title={"@" + problem.addedBy}
               >
                 @{problem.addedBy}
@@ -524,6 +524,15 @@ select:focus + div svg {
 /* Hover effect for select */
 select:hover {
   border-color: var(--color-accent-muted);
+}
+
+/* Ensure username is always purple */
+a[href*='github.com'] {
+  color: var(--color-username) !important;
+}
+
+a[href*='github.com']:hover {
+  color: color-mix(in oklab, var(--color-username) 80%, white) !important;
 }
 
 @keyframes pulse {

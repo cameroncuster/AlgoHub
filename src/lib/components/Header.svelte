@@ -1,5 +1,5 @@
 <script lang="ts">
-import { page } from '$app/stores';
+import { page } from '$app/stores'; // TODO: Update to newer API when refactoring
 import { user } from '$lib/services/auth';
 import { signInWithGithub, signOut, isAdmin } from '$lib/services/auth';
 import { onMount } from 'svelte';
@@ -24,13 +24,20 @@ onMount(() => {
   // Mark component as mounted
   isMounted = true;
 
+  // Set a small timeout to ensure smooth loading and prevent flashing
+  setTimeout(() => {
+    if (isMounted) {
+      // Only set authLoading to false if we have user data or after a timeout
+      if ($user || !$user) {
+        authLoading = false;
+      }
+    }
+  }, 300);
+
   // Set up a subscription to the user store
   const unsubscribe = user.subscribe(async (value) => {
-    // Only set authLoading to false if we're mounted
+    // Only update user data if we're mounted
     if (isMounted) {
-      // Small delay to ensure DOM is ready
-      authLoading = false;
-
       // Check if the user is an admin
       if (value) {
         isUserAdmin = await isAdmin(value.id);
@@ -194,16 +201,17 @@ $: if ($page) {
         {/if}
       </ul>
       <div
-        class="mr-4 flex min-w-[70px] items-center justify-end gap-3 opacity-100 transition-opacity duration-200 sm:mr-2 md:mr-0 {authLoading
+        class="mr-4 flex min-w-[70px] items-center justify-end gap-3 transition-opacity duration-300 sm:mr-2 md:mr-0 {authLoading
           ? 'invisible opacity-0'
-          : ''}"
+          : 'visible opacity-100'}"
+        style="will-change: opacity;"
       >
         {#if $user}
           <a
             href={githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="text-sm font-medium text-[var(--color-heading)] transition-colors duration-200 hover:text-[var(--color-accent)]"
+            class="text-sm font-medium text-[var(--color-username)] transition-colors duration-200 hover:text-[color-mix(in_oklab,var(--color-username)_80%,white)]"
           >
             @{username}
           </a>
@@ -258,14 +266,15 @@ $: if ($page) {
           {/if}
         </ul>
         <div
-          class="mt-2 flex items-center justify-start gap-3 px-1 {authLoading ? 'invisible opacity-0' : ''}"
+          class="mt-2 flex items-center justify-start gap-3 px-1 transition-opacity duration-300 {authLoading ? 'invisible opacity-0' : 'visible opacity-100'}"
+          style="will-change: opacity;"
         >
           {#if $user}
             <a
               href={githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-sm font-medium text-[var(--color-heading)] transition-colors duration-200 hover:text-[var(--color-accent)]"
+              class="text-sm font-medium text-[var(--color-username)] transition-colors duration-200 hover:text-[color-mix(in_oklab,var(--color-username)_80%,white)]"
             >
               @{username}
             </a>
@@ -311,5 +320,14 @@ div.md\:hidden {
 header {
   left: 0;
   right: 0;
+}
+
+/* Ensure username is always purple */
+a[href*='github.com'] {
+  color: var(--color-username) !important;
+}
+
+a[href*='github.com']:hover {
+  color: color-mix(in oklab, var(--color-username) 80%, white) !important;
 }
 </style>
