@@ -23,6 +23,7 @@ let selectedTopic: string | null = null;
 let sidebarOpen = false; // Default closed on mobile
 let isMobile = false;
 let isAuthenticated = false;
+let availableAuthors: string[] = [];
 
 // Problem types
 const PROBLEM_TYPES = ['graph', 'array', 'string', 'math', 'tree', 'queries', 'geometry', 'misc'];
@@ -88,9 +89,8 @@ function sortProblemsByDifficulty(
 let solvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
 let selectedAuthor: string | null = null;
 
-// Function to filter problems by topic, solved status, and author
-function filterProblems(): void {
-  // Start with all problems
+// Function to get problems filtered by everything except author
+function getProblemsWithoutAuthorFilter(): Problem[] {
   let filtered = [...problems];
 
   // Apply topic filter if selected
@@ -111,6 +111,17 @@ function filterProblems(): void {
       return solvedFilterState === 'solved' ? isSolved : !isSolved;
     });
   }
+
+  return filtered;
+}
+
+// Function to filter problems by topic, solved status, and author
+function filterProblems(): void {
+  // Get problems filtered by everything except author
+  let filtered = getProblemsWithoutAuthorFilter();
+
+  // Update available authors based on current filters (except author filter)
+  availableAuthors = [...new Set(filtered.map((p) => p.addedBy))].sort();
 
   // Apply author filter if selected
   if (selectedAuthor) {
@@ -293,6 +304,12 @@ async function handleToggleSolved(problemId: string, isSolved: boolean): Promise
 
 // Function to handle difficulty sorting
 function handleDifficultySort({ detail }: CustomEvent<{ direction: 'asc' | 'desc' | null }>) {
+  // Get problems with all filters except author
+  const problemsWithoutAuthorFilter = getProblemsWithoutAuthorFilter();
+
+  // Update available authors
+  availableAuthors = [...new Set(problemsWithoutAuthorFilter.map((p) => p.addedBy))].sort();
+
   // Sort the problems by difficulty
   filteredProblems = sortProblemsByDifficulty(filteredProblems, detail.direction);
 }
@@ -320,6 +337,9 @@ async function loadProblems() {
 
     // Sort by score only on initial load
     problems = sortProblemsByScore(fetchedProblems);
+
+    // Initialize available authors with all authors
+    availableAuthors = [...new Set(problems.map((p) => p.addedBy))].sort();
 
     // Initialize filtered problems using our filter function
     filterProblems();
@@ -427,6 +447,7 @@ onMount(() => {
               problems={filteredProblems}
               userFeedback={userFeedback}
               userSolvedProblems={userSolvedProblems}
+              allAuthors={availableAuthors}
               onLike={handleLike}
               onToggleSolved={handleToggleSolved}
               on:sortDifficulty={handleDifficultySort}

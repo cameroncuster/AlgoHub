@@ -28,9 +28,16 @@ user.subscribe((value) => {
   isAuthenticated = !!value;
 });
 
-// Extract unique authors from problems
+// We need to get all authors from the parent component
+export let allAuthors: string[] = [];
+
+// If allAuthors is not provided, fall back to extracting from current problems
 $: {
-  uniqueAuthors = [...new Set(problems.map((p) => p.addedBy))].sort();
+  if (allAuthors.length === 0) {
+    uniqueAuthors = [...new Set(problems.map((p) => p.addedBy))].sort();
+  } else {
+    uniqueAuthors = [...allAuthors].sort();
+  }
 }
 
 // Function to handle difficulty column click
@@ -229,11 +236,12 @@ function getDifficultyTooltip(problem: Problem): string {
                   </svg>
                 </div>
                 <select
-                  class="focus:ring-opacity-20 w-full appearance-none rounded-md border border-[var(--color-border)] bg-[var(--color-secondary)] py-1.5 pr-8 pl-9 text-sm text-[var(--color-text)] shadow-sm transition-all duration-200 hover:border-[var(--color-accent-muted)] focus:border-[var(--color-accent)] focus:ring focus:ring-[var(--color-accent)] focus:outline-none"
+                  class="focus:ring-opacity-20 w-full appearance-none rounded-md border py-1.5 pr-8 pl-9 text-sm shadow-sm transition-all duration-200 hover:border-[var(--color-accent-muted)] focus:border-[var(--color-accent)] focus:ring focus:ring-[var(--color-accent)] focus:outline-none ${authorFilterValue ? 'border-[var(--color-accent)] bg-[color-mix(in_oklab,var(--color-accent)_10%,var(--color-secondary))] text-[var(--color-accent)]' : 'border-[var(--color-border)] bg-[var(--color-secondary)] text-[var(--color-text)]'}"
                   on:change={handleAuthorFilter}
                   aria-label="Filter by author"
+                  value={authorFilterValue || 'all'}
                 >
-                  <option value="all">Filter by author...</option>
+                  <option value="all">All recommenders</option>
                   <option value="all" disabled>──────────</option>
                   {#each uniqueAuthors as author}
                     <option value={author}>@{author}</option>
