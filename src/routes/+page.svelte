@@ -84,10 +84,11 @@ function sortProblemsByDifficulty(
   });
 }
 
-// Current solved filter state
+// Filter states
 let solvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
+let selectedAuthor: string | null = null;
 
-// Function to filter problems by topic and solved status
+// Function to filter problems by topic, solved status, and author
 function filterProblems(): void {
   // Start with all problems
   let filtered = [...problems];
@@ -109,6 +110,11 @@ function filterProblems(): void {
       const isSolved = problem.id && userSolvedProblems.has(problem.id);
       return solvedFilterState === 'solved' ? isSolved : !isSolved;
     });
+  }
+
+  // Apply author filter if selected
+  if (selectedAuthor) {
+    filtered = filtered.filter((problem) => problem.addedBy === selectedAuthor);
   }
 
   // Update filtered problems
@@ -297,6 +303,12 @@ function handleSolvedFilter({ detail }: CustomEvent<{ state: 'all' | 'solved' | 
   filterProblems();
 }
 
+// Function to handle author filter
+function handleAuthorFilter({ detail }: CustomEvent<{ author: string | null }>) {
+  selectedAuthor = detail.author;
+  filterProblems();
+}
+
 // Function to load problems
 async function loadProblems() {
   loading = true;
@@ -419,6 +431,7 @@ onMount(() => {
               onToggleSolved={handleToggleSolved}
               on:sortDifficulty={handleDifficultySort}
               on:filterSolved={handleSolvedFilter}
+              on:filterAuthor={handleAuthorFilter}
             />
           </div>
         </div>

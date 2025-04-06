@@ -20,11 +20,18 @@ export let onToggleSolved: (problemId: string, isSolved: boolean) => Promise<voi
 let isAuthenticated = false;
 let difficultySortDirection: 'asc' | 'desc' | null = null;
 let solvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
+let authorFilterValue: string | null = null;
+let uniqueAuthors: string[] = [];
 
 // Subscribe to auth state
 user.subscribe((value) => {
   isAuthenticated = !!value;
 });
+
+// Extract unique authors from problems
+$: {
+  uniqueAuthors = [...new Set(problems.map((p) => p.addedBy))].sort();
+}
 
 // Function to handle difficulty column click
 function handleDifficultySort() {
@@ -54,6 +61,15 @@ function handleSolvedFilter() {
 
   // Dispatch event to parent component
   dispatch('filterSolved', { state: solvedFilterState });
+}
+
+// Function to handle author filter change
+function handleAuthorFilter(event: Event) {
+  const select = event.target as HTMLSelectElement;
+  authorFilterValue = select.value === 'all' ? null : select.value;
+
+  // Dispatch event to parent component
+  dispatch('filterAuthor', { author: authorFilterValue });
 }
 
 // Define common tiers
@@ -190,9 +206,58 @@ function getDifficultyTooltip(problem: Problem): string {
           <th class="sticky top-0 z-10 w-[10%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
             >Topic</th
           >
-          <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
-            >Added By</th
-          >
+          <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+            <div class="flex items-center gap-2">
+              <div class="relative w-full">
+                <div class="pointer-events-none absolute inset-y-0 left-2 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-[var(--color-text-muted)]"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <select
+                  class="focus:ring-opacity-20 w-full appearance-none rounded-md border border-[var(--color-border)] bg-[var(--color-secondary)] py-1.5 pr-8 pl-9 text-sm text-[var(--color-text)] shadow-sm transition-all duration-200 hover:border-[var(--color-accent-muted)] focus:border-[var(--color-accent)] focus:ring focus:ring-[var(--color-accent)] focus:outline-none"
+                  on:change={handleAuthorFilter}
+                  aria-label="Filter by author"
+                >
+                  <option value="all">Filter by author...</option>
+                  <option value="all" disabled>──────────</option>
+                  {#each uniqueAuthors as author}
+                    <option value={author}>@{author}</option>
+                  {/each}
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-[var(--color-text-muted)]"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </th>
           <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-right font-bold"
           ></th>
         </tr>
@@ -202,7 +267,7 @@ function getDifficultyTooltip(problem: Problem): string {
           <tr
             class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0
             ${problem.id && userSolvedProblems.has(problem.id)
-              ? 'bg-[color-mix(in_oklab,rgb(34_197_94)_15%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_20%,transparent)]'
+              ? 'bg-[color-mix(in_oklab,rgb(34_197_94)_25%,transparent)]'
               : 'hover:bg-black/5'}"
           >
             <td class="p-3 text-center">
@@ -436,6 +501,21 @@ tr {
 /* Sortable header styles */
 th {
   transition: background-color 0.2s ease;
+}
+
+/* Custom select styling */
+select {
+  cursor: pointer;
+  background-image: none; /* Remove default arrow */
+}
+
+select:focus + div svg {
+  color: var(--color-accent);
+}
+
+/* Hover effect for select */
+select:hover {
+  border-color: var(--color-accent-muted);
 }
 
 @keyframes pulse {
