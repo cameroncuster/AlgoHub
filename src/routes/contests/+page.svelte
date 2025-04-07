@@ -115,7 +115,7 @@ onMount(() => {
 </script>
 
 <svelte:head>
-  <title>Programming Contests - AlgoHub</title>
+  <title>AlgoHub | Contests</title>
   <meta name="description" content="Browse and track programming contests from various platforms" />
 </svelte:head>
 
