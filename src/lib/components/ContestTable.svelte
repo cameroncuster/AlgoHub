@@ -24,6 +24,7 @@ let difficultyFilter: number | null = null;
 let difficultySortDirection: 'asc' | 'desc' | null = null;
 let participatedFilterState: 'participated' | 'not-participated' | 'all' = 'all';
 let authorFilter: string | null = null;
+let typeFilterState: 'all' | 'icpc' | 'codeforces' = 'all';
 
 // Get unique authors for filter dropdown
 $: authors = [...new Set(contests.map((contest) => contest.addedBy))].sort();
@@ -56,6 +57,14 @@ $: filteredContests = contests.filter((contest) => {
     return false;
   }
 
+  // Filter by contest type
+  if (typeFilterState === 'icpc' && contest.type !== 'ICPC') {
+    return false;
+  }
+  if (typeFilterState === 'codeforces' && contest.type === 'ICPC') {
+    return false;
+  }
+
   return true;
 });
 
@@ -67,6 +76,17 @@ function handleParticipatedFilter() {
     participatedFilterState = 'not-participated';
   } else {
     participatedFilterState = 'all';
+  }
+}
+
+// Handle contest type filter
+function handleTypeFilter() {
+  if (typeFilterState === 'all') {
+    typeFilterState = 'icpc';
+  } else if (typeFilterState === 'icpc') {
+    typeFilterState = 'codeforces';
+  } else {
+    typeFilterState = 'all';
   }
 }
 
@@ -182,9 +202,38 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             </div>
           </th>
           <th
-            class="sticky top-0 z-10 w-[6%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
+            class="sticky top-0 z-10 w-[6%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
             style="min-width: 50px;"
+            on:click={handleTypeFilter}
+            title="Filter by contest type"
           >
+            <div class="flex items-center justify-center gap-1">
+              {#if typeFilterState === 'icpc'}
+                <span class="text-sm font-bold text-[rgb(34_197_94)]">
+                  <img src={icpcLogo} alt="ICPC" class="h-6 w-6 object-contain" />
+                </span>
+              {:else if typeFilterState === 'codeforces'}
+                <span class="text-sm font-bold text-[rgb(239_68_68)]">
+                  <img src={codeforcesLogo} alt="Codeforces" class="h-5 w-5 object-contain" />
+                </span>
+              {:else}
+                <span class="text-sm font-bold text-[var(--color-text-muted)]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                </span>
+              {/if}
+            </div>
           </th>
           <th class="sticky top-0 z-10 w-[34%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
             Contest
