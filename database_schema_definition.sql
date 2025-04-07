@@ -223,25 +223,80 @@ CREATE TABLE IF NOT EXISTS user_solved_problems (
   solved_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(user_id, problem_id)
 );
-
 -- Create RLS policies for user_solved_problems table
 ALTER TABLE user_solved_problems ENABLE ROW LEVEL SECURITY;
-
 -- Users can read all solved problems (needed for displaying statistics)
 CREATE POLICY "Anyone can read solved problems" ON user_solved_problems FOR
 SELECT USING (true);
-
 -- Users can only mark their own problems as solved
 CREATE POLICY "Users can mark their own solved problems" ON user_solved_problems FOR
 INSERT WITH CHECK (auth.uid() = user_id);
-
 -- Users can only update their own solved problems
 CREATE POLICY "Users can update their own solved problems" ON user_solved_problems FOR
 UPDATE USING (auth.uid() = user_id);
-
 -- Users can only delete their own solved problems
-CREATE POLICY "Users can delete their own solved problems" ON user_solved_problems FOR 
-DELETE USING (auth.uid() = user_id);
-
+CREATE POLICY "Users can delete their own solved problems" ON user_solved_problems FOR DELETE USING (auth.uid() = user_id);
 -- Grant access to authenticated users
 GRANT ALL ON user_solved_problems TO authenticated;
+-- Create contests table to track programming contests
+CREATE TABLE IF NOT EXISTS contests (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  url TEXT NOT NULL,
+  duration_seconds INTEGER NOT NULL,
+  difficulty INTEGER,
+  added_by TEXT NOT NULL,
+  added_by_url TEXT NOT NULL,
+  date_added TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  likes INTEGER DEFAULT 0,
+  dislikes INTEGER DEFAULT 0
+);
+-- Create RLS policies for contests table
+ALTER TABLE contests ENABLE ROW LEVEL SECURITY;
+-- Allow anyone to read contests
+CREATE POLICY "Anyone can read contests" ON contests FOR
+SELECT USING (true);
+-- Only admins can insert contests
+CREATE POLICY "Only admins can insert contests" ON contests FOR
+INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1
+      FROM user_roles
+      WHERE user_id = auth.uid()
+        AND role = 'admin'
+    )
+  );
+-- Only admins can update contests
+CREATE POLICY "Only admins can update contests" ON contests FOR
+UPDATE USING (
+    EXISTS (
+      SELECT 1
+      FROM user_roles
+      WHERE user_id = auth.uid()
+        AND role = 'admin'
+    )
+  );
+-- Create user_contest_participation table to track which contests users have participated in
+CREATE TABLE IF NOT EXISTS user_contest_participation (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  contest_id UUID NOT NULL REFERENCES contests(id) ON DELETE CASCADE,
+  participated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, contest_id)
+);
+-- Create RLS policies for user_contest_participation table
+ALTER TABLE user_contest_participation ENABLE ROW LEVEL SECURITY;
+-- Users can read all contest participation data
+CREATE POLICY "Anyone can read contest participation" ON user_contest_participation FOR
+SELECT USING (true);
+-- Users can only register themselves for contests
+CREATE POLICY "Users can register for contests" ON user_contest_participation FOR
+INSERT WITH CHECK (auth.uid() = user_id);
+-- Users can only update their own participation data
+CREATE POLICY "Users can update their own participation" ON user_contest_participation FOR
+UPDATE USING (auth.uid() = user_id);
+-- Users can only delete their own participation data
+CREATE POLICY "Users can delete their own participation" ON user_contest_participation FOR DELETE USING (auth.uid() = user_id);
+-- Grant access to authenticated users
+GRANT ALL ON contests TO authenticated;
+GRANT ALL ON user_contest_participation TO authenticated;
