@@ -2,7 +2,10 @@
 import type { Contest } from '$lib/services/contest';
 import { formatDuration } from '$lib/services/contest';
 import { user } from '$lib/services/auth';
-// No event dispatcher needed
+import { createEventDispatcher } from 'svelte';
+
+// Event dispatcher
+const dispatch = createEventDispatcher();
 
 // Use static image paths for logos
 const codeforcesLogo = '/images/codeforces.png';
@@ -18,6 +21,7 @@ $: isAuthenticated = !!$user;
 
 // Filter states
 let difficultyFilter: number | null = null;
+let difficultySortDirection: 'asc' | 'desc' | null = null;
 let participatedFilterState: 'participated' | 'not-participated' | 'all' = 'all';
 let authorFilter: string | null = null;
 
@@ -66,7 +70,20 @@ function handleParticipatedFilter() {
   }
 }
 
-// Difficulty filter is now just a display, no filtering functionality
+// Handle difficulty sort
+function handleDifficultySort() {
+  // Toggle sort direction: null -> asc -> desc -> null
+  if (difficultySortDirection === null) {
+    difficultySortDirection = 'asc';
+  } else if (difficultySortDirection === 'asc') {
+    difficultySortDirection = 'desc';
+  } else {
+    difficultySortDirection = null;
+  }
+
+  // Dispatch event to parent component
+  dispatch('sortDifficulty', { direction: difficultySortDirection });
+}
 
 function handleAuthorFilter(event: Event) {
   const select = event.target as HTMLSelectElement;
@@ -164,9 +181,12 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
               {/if}
             </div>
           </th>
-          <th class="sticky top-0 z-10 w-[5%] bg-[var(--color-tertiary)] p-3 text-center font-bold">
+          <th
+            class="sticky top-0 z-10 w-[6%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
+            style="min-width: 50px;"
+          >
           </th>
-          <th class="sticky top-0 z-10 w-[35%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+          <th class="sticky top-0 z-10 w-[34%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
             Contest
           </th>
           <th
@@ -175,9 +195,23 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             Duration
           </th>
           <th
-            class="sticky top-0 z-10 w-[15%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold"
+            class="sticky top-0 z-10 w-[15%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            on:click={handleDifficultySort}
+            title="Click to sort by difficulty"
           >
-            <div class="flex items-center justify-center gap-1">
+            <div class="flex items-center justify-center gap-2">
+              {#if difficultySortDirection === 'asc'}
+                <span class="text-sm font-bold text-[var(--color-accent)]">▲</span>
+              {:else if difficultySortDirection === 'desc'}
+                <span class="text-sm font-bold text-[var(--color-accent)]">▼</span>
+              {:else}
+                <span
+                  class="flex flex-col text-sm leading-[1] font-bold text-[var(--color-text-muted)]"
+                >
+                  <span>▲</span>
+                  <span>▼</span>
+                </span>
+              {/if}
               <span>Difficulty</span>
             </div>
           </th>
@@ -263,10 +297,10 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                 </button>
               {/if}
             </td>
-            <td class="p-3 text-center">
+            <td class="p-3 text-center" style="min-width: 50px;">
               <span class="flex items-center justify-center">
                 {#if contest.type === 'ICPC'}
-                  <img src={icpcLogo} alt="ICPC" class="h-6 w-6 object-contain" />
+                  <img src={icpcLogo} alt="ICPC" class="h-8 w-8 object-contain" />
                 {:else}
                   <img src={codeforcesLogo} alt="Codeforces" class="h-6 w-6 object-contain" />
                 {/if}

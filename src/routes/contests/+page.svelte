@@ -11,6 +11,7 @@ import { user } from '$lib/services/auth';
 
 // State
 let contests: Contest[] = [];
+let filteredContests: Contest[] = [];
 let userParticipation: Set<string> = new Set();
 let loading = true;
 let error: string | null = null;
@@ -24,6 +25,7 @@ async function loadContests() {
   try {
     // Fetch contests
     contests = await fetchContests();
+    filteredContests = [...contests];
 
     // Load user participation data if authenticated
     if (isAuthenticated) {
@@ -35,6 +37,31 @@ async function loadContests() {
   } finally {
     loading = false;
   }
+}
+
+// Function to sort contests by difficulty
+function sortContestsByDifficulty(
+  contestsToSort: Contest[],
+  direction: 'asc' | 'desc' | null
+): Contest[] {
+  if (direction === null) {
+    // If no direction specified, return to default sort (original order)
+    return [...contests];
+  }
+
+  return [...contestsToSort].sort((a, b) => {
+    // Handle undefined difficulties
+    const diffA = a.difficulty ?? 0;
+    const diffB = b.difficulty ?? 0;
+
+    // Sort based on direction
+    return direction === 'asc' ? diffA - diffB : diffB - diffA;
+  });
+}
+
+// Handle difficulty sort event
+function handleDifficultySort(event: CustomEvent<{ direction: 'asc' | 'desc' | null }>) {
+  filteredContests = sortContestsByDifficulty(filteredContests, event.detail.direction);
 }
 
 // Handle user participation toggle
@@ -119,9 +146,10 @@ onMount(() => {
     </div>
   {:else}
     <ContestTable
-      contests={contests}
+      contests={filteredContests}
       userParticipation={userParticipation}
       onToggleParticipation={handleToggleParticipation}
+      on:sortDifficulty={handleDifficultySort}
     />
   {/if}
 </div>
