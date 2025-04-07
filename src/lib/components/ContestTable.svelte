@@ -4,8 +4,9 @@ import { formatDuration } from '$lib/services/contest';
 import { user } from '$lib/services/auth';
 // No event dispatcher needed
 
-// Use static image path for Codeforces logo
+// Use static image paths for logos
 const codeforcesLogo = '/images/codeforces.png';
+const icpcLogo = '/images/icpc.svg';
 
 // Props
 export let contests: Contest[] = [];
@@ -264,7 +265,11 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             </td>
             <td class="p-3 text-center">
               <span class="flex items-center justify-center">
-                <img src={codeforcesLogo} alt="Codeforces" class="h-6 w-6 object-contain" />
+                {#if contest.type === 'ICPC'}
+                  <img src={icpcLogo} alt="ICPC" class="h-6 w-6 object-contain" />
+                {:else}
+                  <img src={codeforcesLogo} alt="Codeforces" class="h-6 w-6 object-contain" />
+                {/if}
               </span>
             </td>
             <td class="truncate p-3">

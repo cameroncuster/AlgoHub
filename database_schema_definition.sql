@@ -243,6 +243,7 @@ CREATE TABLE IF NOT EXISTS contests (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
   url TEXT NOT NULL,
+  type TEXT,
   duration_seconds INTEGER NOT NULL,
   difficulty INTEGER,
   added_by TEXT NOT NULL,

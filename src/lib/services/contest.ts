@@ -19,16 +19,21 @@ export type Contest = {
   addedByUrl: string;
   likes: number;
   dislikes: number;
+  type?: string;
 };
 
 /**
  * Database record type from Supabase
  */
-export type ContestRecord = Omit<Contest, 'dateAdded' | 'addedBy' | 'addedByUrl' | 'durationSeconds'> & {
+export type ContestRecord = Omit<
+  Contest,
+  'dateAdded' | 'addedBy' | 'addedByUrl' | 'durationSeconds'
+> & {
   date_added: string;
   added_by: string;
   added_by_url: string;
   duration_seconds: number;
+  type?: string;
 };
 
 /**
@@ -65,7 +70,8 @@ export async function fetchContests(): Promise<Contest[]> {
       addedBy: record.added_by,
       addedByUrl: record.added_by_url,
       likes: record.likes || 0,
-      dislikes: record.dislikes || 0
+      dislikes: record.dislikes || 0,
+      type: record.type
     }));
   } catch (err) {
     console.error('Failed to fetch contests:', err);
@@ -164,7 +170,7 @@ export async function toggleContestParticipation(
 export function formatDuration(durationSeconds: number): string {
   const hours = Math.floor(durationSeconds / 3600);
   const minutes = Math.floor((durationSeconds % 3600) / 60);
-  
+
   if (hours > 0) {
     return `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`;
   } else {
