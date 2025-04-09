@@ -4,7 +4,9 @@ import ContestTable from '$lib/components/ContestTable.svelte';
 import {
   fetchContests,
   fetchUserParticipation,
-  toggleContestParticipation
+  toggleContestParticipation,
+  fetchUserFeedback,
+  updateContestFeedback
 } from '$lib/services/contest';
 import type { Contest } from '$lib/services/contest';
 import { user } from '$lib/services/auth';
@@ -13,6 +15,7 @@ import { user } from '$lib/services/auth';
 let contests: Contest[] = [];
 let filteredContests: Contest[] = [];
 let userParticipation: Set<string> = new Set();
+let userFeedback: Record<string, 'like' | 'dislike' | null> = {};
 let loading = true;
 let error: string | null = null;
 let isAuthenticated = false;
@@ -25,11 +28,14 @@ async function loadContests() {
   try {
     // Fetch contests
     contests = await fetchContests();
-    filteredContests = [...contests];
 
-    // Load user participation data if authenticated
+    // Apply default sorting by likes (most likes first)
+    filteredContests = sortContestsByLikes([...contests], 'desc');
+
+    // Load user participation data and feedback if authenticated
     if (isAuthenticated) {
       userParticipation = await fetchUserParticipation();
+      userFeedback = await fetchUserFeedback();
     }
   } catch (e) {
     console.error('Error loading contests:', e);
@@ -45,8 +51,8 @@ function sortContestsByDifficulty(
   direction: 'asc' | 'desc' | null
 ): Contest[] {
   if (direction === null) {
-    // If no direction specified, return to default sort (original order)
-    return [...contests];
+    // If no direction specified, return to default sort (by likes)
+    return sortContestsByLikes(contestsToSort, 'desc');
   }
 
   return [...contestsToSort].sort((a, b) => {
@@ -57,6 +63,52 @@ function sortContestsByDifficulty(
     // Sort based on direction
     return direction === 'asc' ? diffA - diffB : diffB - diffA;
   });
+}
+
+// Function to calculate contest score (likes - dislikes)
+function calculateScore(contest: Contest): number {
+  return contest.likes - contest.dislikes;
+}
+
+// Function to sort contests by score (likes - dislikes)
+function sortContestsByLikes(
+  contestsToSort: Contest[],
+  direction: 'asc' | 'desc' | null
+): Contest[] {
+  if (direction === null) {
+    // If no direction specified, return to default sort (original order)
+    return [...contests];
+  }
+
+  // Group contests by score
+  const contestsByScore: Record<number, Contest[]> = {};
+
+  // Calculate score for each contest and group them
+  contestsToSort.forEach((contest) => {
+    const score = calculateScore(contest);
+    if (!contestsByScore[score]) {
+      contestsByScore[score] = [];
+    }
+    contestsByScore[score].push(contest);
+  });
+
+  // Sort contests within each score group by ID for consistency
+  Object.values(contestsByScore).forEach((group) => {
+    group.sort((a, b) => {
+      if (a.id && b.id) {
+        return a.id.localeCompare(b.id);
+      }
+      return 0;
+    });
+  });
+
+  // Get all scores and sort them based on direction
+  const scores = Object.keys(contestsByScore)
+    .map(Number)
+    .sort((a, b) => (direction === 'asc' ? a - b : b - a));
+
+  // Flatten the groups in order of score
+  return scores.flatMap((score) => contestsByScore[score]);
 }
 
 // Handle difficulty sort event
@@ -88,19 +140,76 @@ async function handleToggleParticipation(contestId: string, hasParticipated: boo
   }
 }
 
+// Handle like/dislike
+async function handleLike(contestId: string, isLike: boolean) {
+  if (!isAuthenticated) {
+    // Don't allow likes/dislikes if not authenticated
+    return;
+  }
+
+  try {
+    const currentFeedback = userFeedback[contestId];
+    let isUndo = false;
+
+    // Determine if this is an undo operation
+    if ((isLike && currentFeedback === 'like') || (!isLike && currentFeedback === 'dislike')) {
+      isUndo = true;
+    }
+
+    console.log(
+      `Updating contest ${contestId} feedback: isLike=${isLike}, isUndo=${isUndo}, currentFeedback=${currentFeedback}`
+    );
+
+    // Call the service to update feedback
+    const updatedContest = await updateContestFeedback(
+      contestId,
+      isLike,
+      isUndo,
+      currentFeedback || null
+    );
+
+    if (updatedContest) {
+      console.log(
+        `Updated contest: likes=${updatedContest.likes}, dislikes=${updatedContest.dislikes}`
+      );
+
+      // Update the contest in the list
+      const index = filteredContests.findIndex((c) => c.id === contestId);
+      if (index !== -1) {
+        filteredContests[index] = updatedContest;
+        filteredContests = [...filteredContests]; // Trigger reactivity
+      }
+
+      // Update the user feedback state
+      if (isUndo) {
+        delete userFeedback[contestId];
+      } else {
+        userFeedback[contestId] = isLike ? 'like' : 'dislike';
+      }
+      userFeedback = { ...userFeedback }; // Trigger reactivity
+    }
+  } catch (err) {
+    console.error('Error updating contest feedback:', err);
+  }
+}
+
 // Load contests on mount
 onMount(() => {
   // Subscribe to auth state changes
   const unsubscribe = user.subscribe((value) => {
     isAuthenticated = !!value;
 
-    // Reload user participation when auth state changes
+    // Reload user participation and feedback when auth state changes
     if (isAuthenticated) {
       fetchUserParticipation().then((participation) => {
         userParticipation = participation;
       });
+      fetchUserFeedback().then((feedback) => {
+        userFeedback = feedback;
+      });
     } else {
       userParticipation = new Set();
+      userFeedback = {};
     }
   });
 
@@ -148,7 +257,9 @@ onMount(() => {
     <ContestTable
       contests={filteredContests}
       userParticipation={userParticipation}
+      userFeedback={userFeedback}
       onToggleParticipation={handleToggleParticipation}
+      onLike={handleLike}
       on:sortDifficulty={handleDifficultySort}
     />
   {/if}

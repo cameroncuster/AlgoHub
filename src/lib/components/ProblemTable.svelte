@@ -2,6 +2,7 @@
 import type { Problem } from '$lib/services/problem';
 import { user } from '$lib/services/auth';
 import { createEventDispatcher } from 'svelte';
+import RecommendersFilter from './RecommendersFilter.svelte';
 // Use static image paths instead of imports
 const codeforcesLogo = '/images/codeforces.png';
 const kattisLogo = '/images/kattis.png';
@@ -71,14 +72,7 @@ function handleSolvedFilter() {
   dispatch('filterSolved', { state: solvedFilterState });
 }
 
-// Function to handle author filter change
-function handleAuthorFilter(event: Event) {
-  const select = event.target as HTMLSelectElement;
-  authorFilterValue = select.value === 'all' ? null : select.value;
-
-  // Dispatch event to parent component
-  dispatch('filterAuthor', { author: authorFilterValue });
-}
+// Function to handle author filter is now handled directly in the RecommendersFilter component
 
 // Function to handle source filter click
 function handleSourceFilter() {
@@ -257,57 +251,16 @@ function getDifficultyTooltip(problem: Problem): string {
           <th class="sticky top-0 z-10 w-[10%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
             >Topic</th
           >
-          <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+          <th class="sticky top-0 z-10 w-[22%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
             <div class="flex items-center gap-2">
-              <div class="relative w-full">
-                <div class="pointer-events-none absolute inset-y-0 left-2 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="text-[var(--color-text-muted)]"
-                  >
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                  </svg>
-                </div>
-                <select
-                  class="focus:ring-opacity-20 w-full appearance-none rounded-md border py-1.5 pr-8 pl-9 text-sm shadow-sm transition-all duration-200 hover:border-[var(--color-accent-muted)] focus:border-[var(--color-accent)] focus:ring focus:ring-[var(--color-accent)] focus:outline-none ${authorFilterValue ? 'border-[var(--color-accent)] bg-[color-mix(in_oklab,var(--color-accent)_10%,var(--color-secondary))] text-[var(--color-accent)]' : 'border-[var(--color-border)] bg-[var(--color-secondary)] text-[var(--color-text)]'}"
-                  on:change={handleAuthorFilter}
-                  aria-label="Filter by author"
-                  value={authorFilterValue || 'all'}
-                >
-                  <option value="all">All recommenders</option>
-                  <option value="all" disabled>──────────</option>
-                  {#each uniqueAuthors as author}
-                    <option value={author} style="color: var(--color-username);">@{author}</option>
-                  {/each}
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="text-[var(--color-text-muted)]"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </div>
-              </div>
+              <RecommendersFilter
+                authors={uniqueAuthors}
+                selectedAuthor={authorFilterValue}
+                onAuthorChange={(author) => {
+                  authorFilterValue = author;
+                  dispatch('filterAuthor', { author: authorFilterValue });
+                }}
+              />
             </div>
           </th>
           <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-right font-bold"
@@ -555,20 +508,7 @@ th {
   transition: background-color 0.2s ease;
 }
 
-/* Custom select styling */
-select {
-  cursor: pointer;
-  background-image: none; /* Remove default arrow */
-}
-
-select:focus + div svg {
-  color: var(--color-accent);
-}
-
-/* Hover effect for select */
-select:hover {
-  border-color: var(--color-accent-muted);
-}
+/* Select styling is now handled in the RecommendersFilter component */
 
 /* Ensure username is always purple */
 a[href*='github.com'] {
