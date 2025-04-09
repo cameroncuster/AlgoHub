@@ -28,7 +28,9 @@ async function loadContests() {
   try {
     // Fetch contests
     contests = await fetchContests();
-    filteredContests = [...contests];
+
+    // Apply default sorting by likes (most likes first)
+    filteredContests = sortContestsByLikes([...contests], 'desc');
 
     // Load user participation data and feedback if authenticated
     if (isAuthenticated) {
@@ -49,8 +51,8 @@ function sortContestsByDifficulty(
   direction: 'asc' | 'desc' | null
 ): Contest[] {
   if (direction === null) {
-    // If no direction specified, return to default sort (original order)
-    return [...contests];
+    // If no direction specified, return to default sort (by likes)
+    return sortContestsByLikes(contestsToSort, 'desc');
   }
 
   return [...contestsToSort].sort((a, b) => {
@@ -61,6 +63,52 @@ function sortContestsByDifficulty(
     // Sort based on direction
     return direction === 'asc' ? diffA - diffB : diffB - diffA;
   });
+}
+
+// Function to calculate contest score (likes - dislikes)
+function calculateScore(contest: Contest): number {
+  return contest.likes - contest.dislikes;
+}
+
+// Function to sort contests by score (likes - dislikes)
+function sortContestsByLikes(
+  contestsToSort: Contest[],
+  direction: 'asc' | 'desc' | null
+): Contest[] {
+  if (direction === null) {
+    // If no direction specified, return to default sort (original order)
+    return [...contests];
+  }
+
+  // Group contests by score
+  const contestsByScore: Record<number, Contest[]> = {};
+
+  // Calculate score for each contest and group them
+  contestsToSort.forEach((contest) => {
+    const score = calculateScore(contest);
+    if (!contestsByScore[score]) {
+      contestsByScore[score] = [];
+    }
+    contestsByScore[score].push(contest);
+  });
+
+  // Sort contests within each score group by ID for consistency
+  Object.values(contestsByScore).forEach((group) => {
+    group.sort((a, b) => {
+      if (a.id && b.id) {
+        return a.id.localeCompare(b.id);
+      }
+      return 0;
+    });
+  });
+
+  // Get all scores and sort them based on direction
+  const scores = Object.keys(contestsByScore)
+    .map(Number)
+    .sort((a, b) => (direction === 'asc' ? a - b : b - a));
+
+  // Flatten the groups in order of score
+  return scores.flatMap((score) => contestsByScore[score]);
 }
 
 // Handle difficulty sort event
@@ -108,6 +156,10 @@ async function handleLike(contestId: string, isLike: boolean) {
       isUndo = true;
     }
 
+    console.log(
+      `Updating contest ${contestId} feedback: isLike=${isLike}, isUndo=${isUndo}, currentFeedback=${currentFeedback}`
+    );
+
     // Call the service to update feedback
     const updatedContest = await updateContestFeedback(
       contestId,
@@ -117,6 +169,10 @@ async function handleLike(contestId: string, isLike: boolean) {
     );
 
     if (updatedContest) {
+      console.log(
+        `Updated contest: likes=${updatedContest.likes}, dislikes=${updatedContest.dislikes}`
+      );
+
       // Update the contest in the list
       const index = filteredContests.findIndex((c) => c.id === contestId);
       if (index !== -1) {
