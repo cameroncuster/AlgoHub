@@ -47,6 +47,15 @@ export type UserContestParticipation = {
 };
 
 /**
+ * User feedback type
+ */
+export type UserContestFeedback = {
+  user_id: string;
+  contest_id: string;
+  feedback_type: 'like' | 'dislike';
+};
+
+/**
  * Fetches contests from the database
  * @returns Array of contests
  */
@@ -159,6 +168,103 @@ export async function toggleContestParticipation(
   } catch (err) {
     console.error(`Failed to toggle participation for contest ${contestId}:`, err);
     return false;
+  }
+}
+
+/**
+ * Fetches user's feedback for all contests
+ * @returns Record of contestId to feedback type ('like' | 'dislike' | null)
+ */
+export async function fetchUserFeedback(): Promise<Record<string, 'like' | 'dislike' | null>> {
+  const currentUser = get(user);
+
+  if (!currentUser) {
+    return {};
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('user_contest_feedback')
+      .select('contest_id, feedback_type')
+      .eq('user_id', currentUser.id);
+
+    if (error) {
+      console.error('Error fetching user contest feedback:', error);
+      return {};
+    }
+
+    const feedbackMap: Record<string, 'like' | 'dislike' | null> = {};
+
+    data.forEach((item) => {
+      feedbackMap[item.contest_id] = item.feedback_type as 'like' | 'dislike';
+    });
+
+    return feedbackMap;
+  } catch (err) {
+    console.error('Failed to fetch user contest feedback:', err);
+    return {};
+  }
+}
+
+/**
+ * Updates a contest's likes or dislikes in the database
+ * @param contestId - Contest ID
+ * @param isLike - Whether it's a like (true) or dislike (false)
+ * @param isUndo - Whether this is an undo operation
+ * @param previousFeedback - The user's previous feedback (if any)
+ * @returns Promise with the updated contest
+ */
+export async function updateContestFeedback(
+  contestId: string,
+  isLike: boolean,
+  isUndo: boolean = false,
+  previousFeedback: 'like' | 'dislike' | null = null
+): Promise<Contest | null> {
+  const currentUser = get(user);
+
+  if (!currentUser) {
+    console.error('Cannot update feedback: User not authenticated');
+    return null;
+  }
+
+  try {
+    // Call the stored procedure to handle the transaction
+    const { data, error } = await supabase.rpc('update_contest_feedback', {
+      p_contest_id: contestId,
+      p_user_id: currentUser.id,
+      p_is_like: isLike,
+      p_is_undo: isUndo,
+      p_previous_feedback: previousFeedback
+    });
+
+    if (error) {
+      console.error(`Error updating feedback for contest ${contestId}:`, error);
+      return null;
+    }
+
+    if (!data || data.length === 0) {
+      console.error('No data returned from stored procedure');
+      return null;
+    }
+
+    // The stored procedure returns the updated contest record
+    const record = data[0] as ContestRecord;
+    return {
+      id: record.id,
+      name: record.name,
+      url: record.url,
+      durationSeconds: record.duration_seconds,
+      difficulty: record.difficulty,
+      dateAdded: record.date_added,
+      addedBy: record.added_by,
+      addedByUrl: record.added_by_url,
+      likes: record.likes || 0,
+      dislikes: record.dislikes || 0,
+      type: record.type
+    };
+  } catch (err) {
+    console.error(`Failed to update contest ${contestId}:`, err);
+    return null;
   }
 }
 

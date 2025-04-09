@@ -14,7 +14,9 @@ const icpcLogo = '/images/icpc.svg';
 // Props
 export let contests: Contest[] = [];
 export let userParticipation: Set<string> = new Set();
+export let userFeedback: Record<string, 'like' | 'dislike' | null> = {};
 export let onToggleParticipation: (contestId: string, hasParticipated: boolean) => Promise<void>;
+export let onLike: (contestId: string, isLike: boolean) => Promise<void>;
 
 // Computed
 $: isAuthenticated = !!$user;
@@ -389,47 +391,79 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
               </a>
             </td>
             <td class="p-3 text-right">
-              <div class="flex items-center justify-end gap-3">
-                <div class="flex items-center gap-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="text-green-500"
+              <div class="flex justify-end gap-2">
+                {#if contest.id}
+                  {@const hasLiked = userFeedback[contest.id] === 'like'}
+                  {@const hasDisliked = userFeedback[contest.id] === 'dislike'}
+
+                  <!-- Like button -->
+                  <button
+                    class={`flex cursor-pointer items-center gap-1 rounded border px-2 py-1 transition-all duration-200
+                      ${hasLiked
+                        ? 'border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] text-[rgb(34_197_94)]'
+                        : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)]'
+                      } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
+                    on:click={() => isAuthenticated && onLike(contest.id!, true)}
+                    title={!isAuthenticated
+                      ? 'Sign in to like contests'
+                      : hasLiked
+                        ? 'Undo like'
+                        : 'Like this contest'}
+                    disabled={!isAuthenticated}
                   >
-                    <path d="M7 10v12" />
-                    <path
-                      d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"
-                    />
-                  </svg>
-                  <span class="text-sm">{contest.likes}</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="text-red-500"
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="stroke-2"
+                    >
+                      <path
+                        d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"
+                      ></path>
+                    </svg>
+                    <span>{contest.likes}</span>
+                  </button>
+
+                  <!-- Dislike button -->
+                  <button
+                    class={`flex cursor-pointer items-center gap-1 rounded border px-2 py-1 transition-all duration-200
+                      ${hasDisliked
+                        ? 'border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] text-[rgb(239_68_68)]'
+                        : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] hover:text-[rgb(239_68_68)]'
+                      } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
+                    on:click={() => isAuthenticated && onLike(contest.id!, false)}
+                    title={!isAuthenticated
+                      ? 'Sign in to dislike contests'
+                      : hasDisliked
+                        ? 'Undo dislike'
+                        : 'Dislike this contest'}
+                    disabled={!isAuthenticated}
                   >
-                    <path d="M17 14V2" />
-                    <path
-                      d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z"
-                    />
-                  </svg>
-                  <span class="text-sm">{contest.dislikes}</span>
-                </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="stroke-2"
+                    >
+                      <path
+                        d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"
+                      ></path>
+                    </svg>
+                    <span>{contest.dislikes}</span>
+                  </button>
+                {/if}
               </div>
             </td>
           </tr>
