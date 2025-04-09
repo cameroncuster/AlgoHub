@@ -139,10 +139,11 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
 <div class="mt-4 w-full">
   <div class="table-wrapper rounded-lg bg-[var(--color-secondary)] shadow-sm">
     <table
-      class="w-full min-w-[900px] table-fixed border-separate border-spacing-0 overflow-hidden bg-[var(--color-secondary)]"
+      class="w-full min-w-[900px] table-fixed border-collapse overflow-hidden border-none bg-[var(--color-secondary)]"
+      style="border-collapse: separate; border-spacing: 0; border: none;"
     >
       <thead>
-        <tr>
+        <tr style="border: none; background-image: none;">
           <th
             class="sticky top-0 z-10 w-[5%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
             on:click={handleParticipatedFilter}
@@ -244,7 +245,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             Duration
           </th>
           <th
-            class="sticky top-0 z-10 w-[15%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            class="difficulty-col sticky top-0 z-10 w-[15%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
             on:click={handleDifficultySort}
             title="Click to sort by difficulty"
           >
@@ -265,7 +266,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             </div>
           </th>
           <th
-            class="sticky top-0 z-10 w-[21%] border-none bg-[var(--color-tertiary)] p-3 text-left font-bold"
+            class="recommenders-col sticky top-0 z-10 w-[21%] border-none bg-[var(--color-tertiary)] p-3 text-left font-bold"
           >
             <div class="flex items-center gap-2">
               <RecommendersFilter
@@ -476,5 +477,45 @@ tr:hover .solved-button:not(:hover) {
 th,
 td {
   border: none !important;
+  box-shadow: none !important;
+  background-clip: padding-box !important;
+}
+
+/* Specifically target the difficulty and recommenders columns */
+.difficulty-col,
+.recommenders-col {
+  border-right: none !important;
+  border-left: none !important;
+  position: relative;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+}
+
+/* Remove any pseudo-elements that might be creating borders */
+.difficulty-col::after,
+.difficulty-col::before,
+.recommenders-col::after,
+.recommenders-col::before {
+  display: none !important;
+  content: none !important;
+  border: none !important;
+  background: none !important;
+}
+
+/* Target the table header row */
+thead tr {
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Target the specific cells */
+thead tr th:nth-child(5),
+thead tr th:nth-child(6) {
+  border: none !important;
+  box-shadow: none !important;
+  background-image: none !important;
 }
 </style>
