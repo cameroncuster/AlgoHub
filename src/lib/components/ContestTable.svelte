@@ -264,10 +264,8 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
               <span>Difficulty</span>
             </div>
           </th>
-          <th
-            class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
-          >
-            <div class="flex items-center justify-center">
+          <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+            <div class="flex items-center">
               <div class="relative">
                 <div class="flex items-center gap-1">
                   <div class="relative inline-block">
@@ -380,7 +378,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                 <span class="text-[var(--color-text-muted)]">-</span>
               {/if}
             </td>
-            <td class="p-3 text-center">
+            <td class="p-3 text-left">
               <a
                 href={contest.addedByUrl}
                 target="_blank"
