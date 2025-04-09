@@ -18,6 +18,7 @@ export let userParticipation: Set<string> = new Set();
 export let userFeedback: Record<string, 'like' | 'dislike' | null> = {};
 export let onToggleParticipation: (contestId: string, hasParticipated: boolean) => Promise<void>;
 export let onLike: (contestId: string, isLike: boolean) => Promise<void>;
+export let allAuthors: string[] = []; // New prop for filtered authors
 
 // Computed
 $: isAuthenticated = !!$user;
@@ -30,7 +31,11 @@ let authorFilter: string | null = null;
 let typeFilterState: 'all' | 'icpc' | 'codeforces' = 'all';
 
 // Get unique authors for filter dropdown
-$: authors = [...new Set(contests.map((contest) => contest.addedBy))].sort();
+// If allAuthors is provided, use it; otherwise, fall back to extracting from current contests
+$: uniqueAuthors =
+  allAuthors.length > 0
+    ? [...allAuthors].sort()
+    : [...new Set(contests.map((contest) => contest.addedBy))].sort();
 
 // Apply filters to contests
 $: filteredContests = contests.filter((contest) => {
@@ -80,6 +85,9 @@ function handleParticipatedFilter() {
   } else {
     participatedFilterState = 'all';
   }
+
+  // Dispatch event to parent component
+  dispatch('filterParticipated', { state: participatedFilterState });
 }
 
 // Handle contest type filter
@@ -91,6 +99,9 @@ function handleTypeFilter() {
   } else {
     typeFilterState = 'all';
   }
+
+  // Dispatch event to parent component
+  dispatch('filterType', { type: typeFilterState });
 }
 
 // Handle difficulty sort
@@ -267,7 +278,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
           <th class="sticky top-0 z-10 w-[21%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
             <div class="flex items-center gap-2">
               <RecommendersFilter
-                authors={authors}
+                authors={uniqueAuthors}
                 selectedAuthor={authorFilter}
                 width="w-auto min-w-[160px]"
                 onAuthorChange={(author) => {
