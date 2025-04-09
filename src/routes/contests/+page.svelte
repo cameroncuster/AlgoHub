@@ -228,7 +228,7 @@ onMount(() => {
   <meta name="description" content="Browse and track programming contests from various platforms" />
 </svelte:head>
 
-<div class="mx-auto max-w-[1200px] px-4 py-6 sm:px-6 md:px-8">
+<div class="mx-auto w-full max-w-[1200px] bg-[var(--color-primary)] px-0">
   {#if loading}
     <div class="flex h-[calc(100vh-4rem)] items-center justify-center py-2 text-center">
       <div>
@@ -254,13 +254,42 @@ onMount(() => {
       <p>{error}</p>
     </div>
   {:else}
-    <ContestTable
-      contests={filteredContests}
-      userParticipation={userParticipation}
-      userFeedback={userFeedback}
-      onToggleParticipation={handleToggleParticipation}
-      onLike={handleLike}
-      on:sortDifficulty={handleDifficultySort}
-    />
+    <div class="relative flex min-h-[calc(100vh-2rem)]">
+      <!-- Main content -->
+      <div class="flex w-full flex-1">
+        <div class="w-full min-w-0 px-0 py-2 pb-6">
+          <div class="contest-table-container w-full">
+            <ContestTable
+              contests={filteredContests}
+              userParticipation={userParticipation}
+              userFeedback={userFeedback}
+              onToggleParticipation={handleToggleParticipation}
+              onLike={handleLike}
+              on:sortDifficulty={handleDifficultySort}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   {/if}
 </div>
+
+<style>
+@media (max-width: 767px) {
+  :global(body) {
+    overflow-x: hidden;
+  }
+}
+
+/* Remove excess margin from table container */
+.contest-table-container {
+  width: 100%;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .contest-table-container {
+    margin: 0;
+  }
+}
+</style>
