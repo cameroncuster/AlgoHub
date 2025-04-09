@@ -3,6 +3,7 @@ import type { Contest } from '$lib/services/contest';
 import { formatDuration } from '$lib/services/contest';
 import { user } from '$lib/services/auth';
 import { createEventDispatcher } from 'svelte';
+import RecommendersFilter from './RecommendersFilter.svelte';
 
 // Event dispatcher
 const dispatch = createEventDispatcher();
@@ -107,10 +108,7 @@ function handleDifficultySort() {
   dispatch('sortDifficulty', { direction: difficultySortDirection });
 }
 
-function handleAuthorFilter(event: Event) {
-  const select = event.target as HTMLSelectElement;
-  authorFilter = select.value === 'all' ? null : select.value;
-}
+// Function to handle author filter is now handled directly in the RecommendersFilter component
 
 // Generate star rating display
 function getDifficultyStars(difficulty: number | undefined): string {
@@ -241,7 +239,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             Contest
           </th>
           <th
-            class="sticky top-0 z-10 w-[15%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
+            class="sticky top-0 z-10 w-[12%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
           >
             Duration
           </th>
@@ -266,42 +264,17 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
               <span>Difficulty</span>
             </div>
           </th>
-          <th class="sticky top-0 z-10 w-[20%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
-            <div class="flex items-center">
-              <div class="relative">
-                <div class="flex items-center gap-1">
-                  <div class="relative inline-block">
-                    <select
-                      class="appearance-none rounded border border-[var(--color-border)] bg-transparent px-2 py-1 pr-7 text-sm text-[var(--color-text)] focus:border-[var(--color-accent)] focus:outline-none"
-                      on:change={handleAuthorFilter}
-                      value={authorFilter || 'all'}
-                    >
-                      <option value="all">All recommenders</option>
-                      {#each authors as author}
-                        <option value={author} style="color: var(--color-username);"
-                          >@{author}</option
-                        >
-                      {/each}
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="text-[var(--color-text-muted)]"
-                      >
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <th class="sticky top-0 z-10 w-[21%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+            <div class="flex items-center gap-2">
+              <RecommendersFilter
+                authors={authors}
+                selectedAuthor={authorFilter}
+                width="w-auto min-w-[160px]"
+                onAuthorChange={(author) => {
+                  authorFilter = author;
+                  dispatch('filterAuthor', { author: authorFilter });
+                }}
+              />
             </div>
           </th>
           <th class="sticky top-0 z-10 w-[5%] bg-[var(--color-tertiary)] p-3 text-right font-bold"
