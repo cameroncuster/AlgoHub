@@ -139,7 +139,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
 <div class="mt-4 w-full">
   <div class="table-wrapper rounded-lg bg-[var(--color-secondary)] shadow-sm">
     <table
-      class="w-full min-w-[900px] table-fixed border-collapse overflow-hidden bg-[var(--color-secondary)]"
+      class="w-full min-w-[900px] table-fixed border-separate border-spacing-0 overflow-hidden bg-[var(--color-secondary)]"
     >
       <thead>
         <tr>
@@ -264,7 +264,9 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
               <span>Difficulty</span>
             </div>
           </th>
-          <th class="sticky top-0 z-10 w-[21%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+          <th
+            class="sticky top-0 z-10 w-[21%] border-none bg-[var(--color-tertiary)] p-3 text-left font-bold"
+          >
             <div class="flex items-center gap-2">
               <RecommendersFilter
                 authors={authors}
@@ -284,7 +286,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
       <tbody>
         {#each filteredContests as contest}
           <tr
-            class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0
+            class="relative transition-colors duration-200
             ${contest.id && userParticipation.has(contest.id)
               ? 'border-l-4 border-l-[rgb(34_197_94)] bg-[var(--color-solved-row)]'
               : 'hover:bg-black/5'}"
@@ -468,5 +470,11 @@ tr:hover .solved-button:not(:hover) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Remove any unwanted borders */
+th,
+td {
+  border: none !important;
 }
 </style>

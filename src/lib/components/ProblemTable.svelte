@@ -270,7 +270,7 @@ function getDifficultyTooltip(problem: Problem): string {
       <tbody>
         {#each problems as problem}
           <tr
-            class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0
+            class="relative transition-colors duration-200
             ${problem.id && userSolvedProblems.has(problem.id)
               ? 'border-l-4 border-l-[rgb(34_197_94)] bg-[var(--color-solved-row)]'
               : 'hover:bg-black/5'}"
@@ -526,5 +526,11 @@ a[href*='github.com']:hover {
   100% {
     box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
   }
+}
+
+/* Remove any unwanted borders */
+th,
+td {
+  border: none !important;
 }
 </style>
