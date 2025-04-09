@@ -153,6 +153,7 @@ function getDifficultyTooltip(problem: Problem): string {
                     stroke-linejoin="round"
                   >
                     <path d="M20 6 9 17l-5-5" />
+                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" fill="none" opacity="0.2" />
                   </svg>
                 </span>
               {:else if solvedFilterState === 'unsolved'}
@@ -170,6 +171,7 @@ function getDifficultyTooltip(problem: Problem): string {
                   >
                     <path d="M18 6 6 18" />
                     <path d="m6 6 12 12" />
+                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" fill="none" opacity="0.2" />
                   </svg>
                 </span>
               {:else}
@@ -185,7 +187,7 @@ function getDifficultyTooltip(problem: Problem): string {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
                   </svg>
                 </span>
               {/if}
@@ -199,11 +201,21 @@ function getDifficultyTooltip(problem: Problem): string {
             <div class="flex items-center justify-center gap-1">
               {#if sourceFilterValue === 'codeforces'}
                 <span class="text-sm font-bold text-[#3B5998]">
-                  <img src={codeforcesLogo} alt="Codeforces" class="h-5 w-5 object-contain" />
+                  <div class="relative">
+                    <img src={codeforcesLogo} alt="Codeforces" class="h-5 w-5 object-contain" />
+                    <div
+                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded-full border border-white bg-[#3B5998]"
+                    ></div>
+                  </div>
                 </span>
               {:else if sourceFilterValue === 'kattis'}
                 <span class="text-sm font-bold text-[#f2ae00]">
-                  <img src={kattisLogo} alt="Kattis" class="h-5 w-5 object-contain" />
+                  <div class="relative">
+                    <img src={kattisLogo} alt="Kattis" class="h-5 w-5 object-contain" />
+                    <div
+                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded-full border border-white bg-[#f2ae00]"
+                    ></div>
+                  </div>
                 </span>
               {:else}
                 <span class="text-sm font-bold text-[var(--color-text-muted)]">
@@ -218,7 +230,7 @@ function getDifficultyTooltip(problem: Problem): string {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
                   </svg>
                 </span>
               {/if}
