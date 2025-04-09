@@ -206,7 +206,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
                   </svg>
                 </span>
               {/if}
@@ -221,11 +221,21 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             <div class="flex items-center justify-center gap-1">
               {#if typeFilterState === 'icpc'}
                 <span class="text-sm font-bold text-[rgb(34_197_94)]">
-                  <img src={icpcLogo} alt="ICPC" class="h-6 w-6 object-contain" />
+                  <div class="relative">
+                    <img src={icpcLogo} alt="ICPC" class="h-6 w-6 object-contain" />
+                    <div
+                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded-full border border-white bg-[rgb(34_197_94)]"
+                    ></div>
+                  </div>
                 </span>
               {:else if typeFilterState === 'codeforces'}
                 <span class="text-sm font-bold text-[rgb(239_68_68)]">
-                  <img src={codeforcesLogo} alt="Codeforces" class="h-5 w-5 object-contain" />
+                  <div class="relative">
+                    <img src={codeforcesLogo} alt="Codeforces" class="h-5 w-5 object-contain" />
+                    <div
+                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded-full border border-white bg-[rgb(239_68_68)]"
+                    ></div>
+                  </div>
                 </span>
               {:else}
                 <span class="text-sm font-bold text-[var(--color-text-muted)]">
@@ -240,7 +250,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z" />
                   </svg>
                 </span>
               {/if}
