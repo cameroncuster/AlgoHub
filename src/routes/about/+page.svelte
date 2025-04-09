@@ -1,5 +1,5 @@
 <script lang="ts">
-  // About page for AlgoHub
+// About page for AlgoHub
 </script>
 
 <svelte:head>
@@ -7,14 +7,14 @@
   <meta name="description" content="About this app" />
 </svelte:head>
 
-<div class="max-w-3xl mx-auto px-4 py-8">
+<div class="mx-auto max-w-3xl px-4 py-8">
   <section class="mb-10">
-    <h2 class="text-2xl mb-4 text-accent">AlgoHub</h2>
+    <h2 class="text-accent mb-4 text-2xl">AlgoHub</h2>
     <p class="mb-4 leading-relaxed">
       AlgoHub is a collection of hand-picked problems. If you are new to competitive programming you
       can learn the fundamentals at some of these sites:
     </p>
-    <ul class="ml-6 mb-4">
+    <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a href="https://cses.fi/" target="_blank" rel="noopener noreferrer">CSES Problem Set</a>
       </li>
@@ -38,7 +38,7 @@
       </li>
     </ul>
 
-    <h3 class="text-xl mb-4 text-accent">Beyond the Fundamentals</h3>
+    <h3 class="text-accent mb-4 text-xl">Beyond the Fundamentals</h3>
     <p class="mb-4 leading-relaxed">
       But what about once you've learned the fundamentals? How should you practice then? Experts
       like Umnik recommend working through an archive of problems (as described in this
@@ -54,7 +54,7 @@
       own lists of recommendations.
     </p>
 
-    <h3 class="text-xl mb-4 text-accent">Canon Problems</h3>
+    <h3 class="text-accent mb-4 text-xl">Canon Problems</h3>
     <p class="mb-4 leading-relaxed">
       Inspired by "Canon Events" from <i>Across the Spiderverse</i>, Canon Problems are the problems
       that after solving, fundamentally changed the way you approach competitive programming
@@ -67,8 +67,8 @@
   </section>
 
   <section class="mb-10">
-    <h2 class="text-2xl mb-4 text-accent">On Practicing</h2>
-    <ul class="ml-6 mb-4">
+    <h2 class="text-accent mb-4 text-2xl">On Practicing</h2>
+    <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a href="https://codeforces.com/blog/entry/98806" target="_blank" rel="noopener noreferrer">
           How to practice Competitive Programming [Um_nik version]
@@ -97,10 +97,10 @@
   </section>
 
   <section class="mb-10">
-    <h2 class="text-2xl mb-4 text-accent">Algorithm Libraries</h2>
+    <h2 class="text-accent mb-4 text-2xl">Algorithm Libraries</h2>
 
-    <h3 class="text-xl mb-4 text-accent">AlgoHub's Library of Choice</h3>
-    <ul class="ml-6 mb-4">
+    <h3 class="text-accent mb-4 text-xl">AlgoHub's Library of Choice</h3>
+    <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a
           href="https://github.com/programming-team-code"
@@ -113,8 +113,8 @@
       </li>
     </ul>
 
-    <h3 class="text-xl mb-4 text-accent">Optimized for ICPC</h3>
-    <ul class="ml-6 mb-4">
+    <h3 class="text-accent mb-4 text-xl">Optimized for ICPC</h3>
+    <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a
           href="https://github.com/kth-competitive-programming/kactl"
@@ -145,8 +145,8 @@
       </li>
     </ul>
 
-    <h3 class="text-xl mb-4 text-accent">Optimized for Online Contests</h3>
-    <ul class="ml-6 mb-4">
+    <h3 class="text-accent mb-4 text-xl">Optimized for Online Contests</h3>
+    <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a
           href="https://github.com/yosupo06/library-checker-problems"
@@ -156,8 +156,8 @@
       </li>
     </ul>
 
-    <h3 class="text-xl mb-4 text-accent">Extensive Libraries</h3>
-    <ul class="ml-6 mb-4">
+    <h3 class="text-accent mb-4 text-xl">Extensive Libraries</h3>
+    <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a
           href="https://github.com/koosaga/olympiad/tree/master/Library/codes"
@@ -181,8 +181,8 @@
       </li>
     </ul>
 
-    <h3 class="text-xl mb-4 text-accent">Clean Implementations</h3>
-    <ul class="ml-6 mb-4">
+    <h3 class="text-accent mb-4 text-xl">Clean Implementations</h3>
+    <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a
           href="https://github.com/demidenko/olymp-cpp-lib"
@@ -199,8 +199,8 @@
       </li>
     </ul>
 
-    <h3 class="text-xl mb-4 text-accent">Top Competitive Programmers' Libraries</h3>
-    <ul class="ml-6 mb-4">
+    <h3 class="text-accent mb-4 text-xl">Top Competitive Programmers' Libraries</h3>
+    <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a href="https://github.com/ecnerwala/cp-book" target="_blank" rel="noopener noreferrer"
           >ecnerwala's CP Book</a
@@ -232,8 +232,8 @@
       </li>
     </ul>
 
-    <h3 class="text-xl mb-4 text-accent">Python</h3>
-    <ul class="ml-6 mb-4">
+    <h3 class="text-accent mb-4 text-xl">Python</h3>
+    <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a
           href="https://github.com/cheran-senthil/PyRival"
@@ -245,7 +245,7 @@
   </section>
 
   <section class="mb-10">
-    <h2 class="text-2xl mb-4 text-accent">Contribute</h2>
+    <h2 class="text-accent mb-4 text-2xl">Contribute</h2>
     <p class="mb-4 leading-relaxed">
       AlgoHub is an open-source project, and we welcome contributions from the community. If you'd
       like to help improve AlgoHub, please check out our <a
@@ -256,3 +256,15 @@
     </p>
   </section>
 </div>
+
+<style>
+/* Make links purple on the about page for better visibility */
+:global(.max-w-3xl a) {
+  color: var(--color-accent);
+}
+
+:global(.max-w-3xl a:hover) {
+  color: color-mix(in oklab, var(--color-accent) 80%, white);
+  text-decoration: underline;
+}
+</style>
