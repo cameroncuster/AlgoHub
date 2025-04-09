@@ -191,10 +191,7 @@ function getDifficultyTooltip(problem: Problem): string {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <path d="M22 12h-4" />
-                    <path d="M6 12H2" />
-                    <path d="M12 6v4" />
-                    <path d="M12 14v4" />
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                   </svg>
                 </span>
               {/if}
@@ -227,9 +224,7 @@ function getDifficultyTooltip(problem: Problem): string {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"></path>
-                    <path d="M3 12h6"></path>
-                    <path d="M15 12h6"></path>
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                   </svg>
                 </span>
               {/if}
