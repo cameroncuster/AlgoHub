@@ -42,9 +42,11 @@ Note that the paths in `init.sql` are relative to the `sql` directory, so you sh
 The database schema consists of several related tables:
 
 1. **User Management**
+
    - `user_roles` - Stores user roles (admin, user)
 
 2. **Problems**
+
    - `problems` - Stores programming problems
    - `user_problem_feedback` - Tracks user likes/dislikes for problems
    - `user_solved_problems` - Tracks which problems users have solved
