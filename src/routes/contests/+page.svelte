@@ -19,6 +19,89 @@ let userFeedback: Record<string, 'like' | 'dislike' | null> = {};
 let loading = true;
 let error: string | null = null;
 let isAuthenticated = false;
+let availableAuthors: string[] = [];
+let authorFilter: string | null = null;
+
+// Filter states
+let participatedFilterState: 'participated' | 'not-participated' | 'all' = 'all';
+let typeFilterState: 'all' | 'icpc' | 'codeforces' = 'all';
+
+// Function to get contests filtered by everything except author
+function getContestsWithoutAuthorFilter(): Contest[] {
+  return contests.filter((contest) => {
+    // Filter by participation status
+    if (
+      participatedFilterState === 'participated' &&
+      contest.id &&
+      !userParticipation.has(contest.id)
+    ) {
+      return false;
+    }
+    if (
+      participatedFilterState === 'not-participated' &&
+      contest.id &&
+      userParticipation.has(contest.id)
+    ) {
+      return false;
+    }
+
+    // Filter by contest type
+    if (typeFilterState === 'icpc' && contest.type !== 'ICPC') {
+      return false;
+    }
+    if (typeFilterState === 'codeforces' && contest.type === 'ICPC') {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+// Function to update available authors based on current filters
+function updateAvailableAuthors(): void {
+  // Get contests filtered by everything except author
+  const contestsWithoutAuthorFilter = getContestsWithoutAuthorFilter();
+
+  // Update available authors based on current filters
+  availableAuthors = [...new Set(contestsWithoutAuthorFilter.map((c) => c.addedBy))].sort();
+}
+
+// Function to handle participation filter
+function handleParticipatedFilter({
+  detail
+}: CustomEvent<{ state: 'all' | 'participated' | 'not-participated' }>): void {
+  participatedFilterState = detail.state;
+  updateFilters();
+}
+
+// Function to handle type filter
+function handleTypeFilter({ detail }: CustomEvent<{ type: 'all' | 'icpc' | 'codeforces' }>): void {
+  typeFilterState = detail.type;
+  updateFilters();
+}
+
+// Function to handle author filter
+function handleAuthorFilter({ detail }: CustomEvent<{ author: string | null }>): void {
+  authorFilter = detail.author;
+  updateFilters();
+}
+
+// Function to update filters and filtered contests
+function updateFilters(): void {
+  // Update available authors based on current filters
+  updateAvailableAuthors();
+
+  // Apply filters to get updated contests list
+  let filtered = getContestsWithoutAuthorFilter();
+
+  // Apply author filter if selected
+  if (authorFilter) {
+    filtered = filtered.filter((contest) => contest.addedBy === authorFilter);
+  }
+
+  // Update filtered contests
+  filteredContests = sortContestsByLikes(filtered, 'desc');
+}
 
 // Function to load contests
 async function loadContests() {
@@ -31,6 +114,9 @@ async function loadContests() {
 
     // Apply default sorting by likes (most likes first)
     filteredContests = sortContestsByLikes([...contests], 'desc');
+
+    // Initialize available authors with all authors
+    updateAvailableAuthors();
 
     // Load user participation data and feedback if authenticated
     if (isAuthenticated) {
@@ -263,9 +349,13 @@ onMount(() => {
               contests={filteredContests}
               userParticipation={userParticipation}
               userFeedback={userFeedback}
+              allAuthors={availableAuthors}
               onToggleParticipation={handleToggleParticipation}
               onLike={handleLike}
               on:sortDifficulty={handleDifficultySort}
+              on:filterAuthor={handleAuthorFilter}
+              on:filterParticipated={handleParticipatedFilter}
+              on:filterType={handleTypeFilter}
             />
           </div>
         </div>
