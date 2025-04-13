@@ -23,6 +23,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 \i contests/user_contest_feedback.sql
 \i contests/contest_functions.sql
 
+-- Leaderboard functions
+\i leaderboard/leaderboard_functions.sql
+
 -- Grant necessary permissions
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;

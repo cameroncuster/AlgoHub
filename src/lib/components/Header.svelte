@@ -187,6 +187,17 @@ $: if ($page) {
           >
         </li>
         <li
+          class="relative {$page.url.pathname === '/leaderboard'
+            ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
+            : ''}"
+        >
+          <a
+            href="/leaderboard"
+            class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+            >Leaderboard</a
+          >
+        </li>
+        <li
           class="relative {$page.url.pathname === '/about'
             ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
             : ''}"
@@ -264,6 +275,13 @@ $: if ($page) {
               href="/contests"
               class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] {$page.url.pathname === '/contests' ? 'text-[var(--color-accent)]' : ''}"
               >Contests</a
+            >
+          </li>
+          <li>
+            <a
+              href="/leaderboard"
+              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] {$page.url.pathname === '/leaderboard' ? 'text-[var(--color-accent)]' : ''}"
+              >Leaderboard</a
             >
           </li>
           <li>
