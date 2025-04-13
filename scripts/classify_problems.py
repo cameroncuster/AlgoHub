@@ -4,7 +4,6 @@ import argparse
 import psycopg
 import requests
 from bs4 import BeautifulSoup
-import json
 from dotenv import load_dotenv
 import google.generativeai as genai
 import re
@@ -168,7 +167,7 @@ class ProblemFetcher:
                     "tags": ["gym"],
                 }
             elif not problem:
-                print(f"Problem not found in API response")
+                print("Problem not found in API response")
                 return None
             else:
                 problem = {"name": problem["name"], "tags": problem.get("tags", [])}
