@@ -47,5 +47,6 @@ footer {
   left: 0;
   right: 0;
   width: 100%;
+  margin-top: auto;
 }
 </style>

@@ -24,7 +24,7 @@ onMount(() => {
 });
 </script>
 
-<div class="flex min-h-screen flex-col">
+<div class="flex min-h-screen flex-col overflow-hidden">
   <Header />
 
   <main
@@ -38,11 +38,15 @@ onMount(() => {
 
 <style>
 /* Global styles that can't be handled with Tailwind directly */
+:global(html),
 :global(body) {
   overflow-x: hidden;
   max-width: 100vw;
   margin: 0;
   padding: 0;
+  overscroll-behavior-y: none;
+  position: relative;
+  height: 100%;
 }
 
 :global(.container) {

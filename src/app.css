@@ -65,11 +65,21 @@
 }
 
 /* Base styles */
+html,
 body {
-  min-height: 100vh;
+  height: 100%;
   margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   background-color: var(--color-primary);
   color: var(--color-text);
+  overscroll-behavior: none;
+}
+
+#app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 #svelte {
