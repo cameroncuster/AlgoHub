@@ -12,21 +12,21 @@ function formatNumber(num: number): string {
 
 <div class="mt-4 w-full">
   <div class="table-wrapper rounded-lg bg-[var(--color-secondary)] shadow-sm">
-    <table
-      class="w-full min-w-[900px] table-fixed border-collapse overflow-hidden bg-[var(--color-secondary)]"
-    >
+    <table class="w-full table-fixed border-collapse overflow-hidden bg-[var(--color-secondary)]">
       <thead>
         <tr>
           <th
-            class="sticky top-0 z-10 w-[10%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
+            class="sticky top-0 z-10 w-[15%] bg-[var(--color-tertiary)] p-2 text-center font-bold sm:w-[10%] sm:p-3"
           >
             Rank
           </th>
-          <th class="sticky top-0 z-10 w-[60%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+          <th
+            class="sticky top-0 z-10 w-[55%] bg-[var(--color-tertiary)] p-2 text-left font-bold sm:w-[60%] sm:p-3"
+          >
             User
           </th>
           <th
-            class="sticky top-0 z-10 w-[30%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
+            class="sticky top-0 z-10 w-[30%] bg-[var(--color-tertiary)] p-2 text-center font-bold sm:p-3"
           >
             Solves
           </th>
@@ -37,7 +37,7 @@ function formatNumber(num: number): string {
           <tr
             class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0 hover:bg-black/5"
           >
-            <td class="p-3 text-center">
+            <td class="p-2 text-center sm:p-3">
               <!-- Rank with special styling for top 3 -->
               {#if entry.rank === 1}
                 <span
@@ -61,17 +61,17 @@ function formatNumber(num: number): string {
                 <span class="font-medium text-[var(--color-text-muted)]">{entry.rank}</span>
               {/if}
             </td>
-            <td class="p-3">
-              <div class="flex items-center gap-3">
+            <td class="p-2 sm:p-3">
+              <div class="flex items-center gap-1 sm:gap-3">
                 {#if entry.avatarUrl}
                   <img
                     src={entry.avatarUrl}
                     alt={entry.username}
-                    class="h-10 w-10 rounded-full border border-[var(--color-border)]"
+                    class="h-8 w-8 rounded-full border border-[var(--color-border)] sm:h-10 sm:w-10"
                   />
                 {:else}
                   <div
-                    class="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-tertiary)] text-sm font-medium"
+                    class="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-tertiary)] text-xs font-medium sm:h-10 sm:w-10 sm:text-sm"
                   >
                     {entry.username.substring(0, 2).toUpperCase()}
                   </div>
@@ -87,7 +87,7 @@ function formatNumber(num: number): string {
                 </a>
               </div>
             </td>
-            <td class="p-3 text-center font-medium">
+            <td class="p-2 text-center font-medium sm:p-3">
               {formatNumber(entry.problemsSolved)}
             </td>
           </tr>
@@ -103,6 +103,11 @@ function formatNumber(num: number): string {
   div {
     margin-left: auto;
     margin-right: auto;
+  }
+
+  /* Make username text smaller on mobile */
+  a[href*='github.com'] {
+    font-size: 0.9rem;
   }
 }
 
@@ -123,6 +128,22 @@ function formatNumber(num: number): string {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   width: 100%;
+}
+
+/* Extra small screen adjustments */
+@media (max-width: 480px) {
+  /* Further reduce padding and spacing */
+  td,
+  th {
+    padding: 0.5rem 0.25rem !important;
+  }
+
+  /* Make rank bubbles smaller on very small screens */
+  .inline-flex.h-8.w-8 {
+    height: 1.5rem !important;
+    width: 1.5rem !important;
+    font-size: 0.75rem !important;
+  }
 }
 
 /* Ensure username is always purple */
