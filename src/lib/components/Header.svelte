@@ -302,7 +302,7 @@ $: if ($page) {
           {/if}
         </ul>
         <div
-          class="mt-2 flex items-center justify-start gap-3 px-1 transition-opacity duration-300 {authLoading ? 'invisible opacity-0' : 'visible opacity-100'}"
+          class="mt-2 flex flex-col items-start justify-start gap-3 px-1 transition-opacity duration-300 {authLoading ? 'invisible opacity-0' : 'visible opacity-100'}"
           style="will-change: opacity;"
         >
           {#if $user}
