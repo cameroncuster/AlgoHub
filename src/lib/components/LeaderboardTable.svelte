@@ -92,14 +92,6 @@ function formatNumber(num: number): string {
             </td>
           </tr>
         {/each}
-
-        {#if leaderboardEntries.length === 0}
-          <tr>
-            <td colspan="3" class="p-8 text-center text-[var(--color-text-muted)]">
-              No data available. Start solving problems to appear on the leaderboard!
-            </td>
-          </tr>
-        {/if}
       </tbody>
     </table>
   </div>
