@@ -27,6 +27,8 @@ CREATE OR REPLACE FUNCTION get_leaderboard() RETURNS TABLE (
       ) AS earliest_solves_sum
     FROM auth.users u
       LEFT JOIN user_solved_problems usp ON u.id = usp.user_id
+      LEFT JOIN user_preferences up ON u.id = up.user_id
+    WHERE COALESCE(up.hide_from_leaderboard, false) = false
     GROUP BY u.id,
       u.raw_user_meta_data
     HAVING COUNT(usp.problem_id) > 0
