@@ -41,19 +41,19 @@ function formatNumber(num: number): string {
               <!-- Rank with special styling for top 3 -->
               {#if entry.rank === 1}
                 <span
-                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-legendary-grandmaster)] font-bold text-white"
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-leaderboard-first)] font-bold text-white"
                 >
                   {entry.rank}
                 </span>
               {:else if entry.rank === 2}
                 <span
-                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-specialist)] font-bold text-white"
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-leaderboard-second)] font-bold text-white"
                 >
                   {entry.rank}
                 </span>
               {:else if entry.rank === 3}
                 <span
-                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-pupil)] font-bold text-white"
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-leaderboard-third)] font-bold text-white"
                 >
                   {entry.rank}
                 </span>
