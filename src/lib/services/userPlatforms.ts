@@ -131,6 +131,7 @@ export async function importCodeforcesSolves(codeforcesUsername: string): Promis
   success: boolean;
   message?: string;
   totalSolved?: number;
+  matchedCount?: number;
   importedCount?: number;
 }> {
   const currentUser = get(user);
@@ -150,16 +151,43 @@ export async function importCodeforcesSolves(codeforcesUsername: string): Promis
   }
 
   try {
+    console.log(`Fetching solved problems for Codeforces user: ${codeforcesUsername}`);
+
     // Fetch user's solved problems from Codeforces API
-    const response = await fetch(`/api/codeforces/user-solves?username=${codeforcesUsername}`);
+    const response = await fetch(
+      `/api/codeforces/user-solves?username=${encodeURIComponent(codeforcesUsername)}`
+    );
     const data = await response.json();
 
     if (!response.ok) {
+      console.error('Error response from Codeforces API:', data);
+
+      // Check if the error is related to user not found
+      if (data.error && data.error.includes('not found')) {
+        return {
+          success: false,
+          message: `User "${codeforcesUsername}" not found on Codeforces. Please check that you've entered your Codeforces username correctly (case-sensitive). You can verify your username by checking if this link works: <a href="https://codeforces.com/profile/${codeforcesUsername}" target="_blank" rel="noopener noreferrer" class="text-[var(--color-accent)]">https://codeforces.com/profile/${codeforcesUsername}</a>`
+        };
+      }
+
       return {
         success: false,
         message: data.error || 'Failed to fetch solved problems from Codeforces'
       };
     }
+
+    // Check if we got a valid response with solvedProblems array
+    if (!data.solvedProblems) {
+      console.error('Invalid response from Codeforces API:', data);
+      return {
+        success: false,
+        message: 'Invalid response from Codeforces API'
+      };
+    }
+
+    console.log(
+      `Found ${data.solvedProblems.length} solved problems for Codeforces user: ${codeforcesUsername}`
+    );
 
     // Get all problems from our database
     const { data: problems, error: problemsError } = await supabase.from('problems').select('*');
@@ -171,6 +199,8 @@ export async function importCodeforcesSolves(codeforcesUsername: string): Promis
         message: `Error fetching problems: ${problemsError.message}`
       };
     }
+
+    console.log(`Found ${problems.length} problems in our database`);
 
     // Map problems by URL for easy lookup
     const problemsByUrl = new Map<string, Problem>();
@@ -192,6 +222,8 @@ export async function importCodeforcesSolves(codeforcesUsername: string): Promis
         });
       }
     }
+
+    console.log(`Matched ${matchedProblems.length} problems with our database`);
 
     // Insert matched problems into user_solved_problems table
     if (matchedProblems.length > 0) {
@@ -215,6 +247,8 @@ export async function importCodeforcesSolves(codeforcesUsername: string): Promis
         (item) => !existingSolvedIds.has(item.problem_id)
       );
 
+      console.log(`Found ${newSolvedProblems.length} new problems to mark as solved`);
+
       if (newSolvedProblems.length > 0) {
         const { error: insertError } = await supabase
           .from('user_solved_problems')
@@ -232,6 +266,7 @@ export async function importCodeforcesSolves(codeforcesUsername: string): Promis
       return {
         success: true,
         totalSolved: solvedProblems.length,
+        matchedCount: matchedProblems.length,
         importedCount: newSolvedProblems.length
       };
     }
@@ -239,6 +274,7 @@ export async function importCodeforcesSolves(codeforcesUsername: string): Promis
     return {
       success: true,
       totalSolved: solvedProblems.length,
+      matchedCount: matchedProblems.length,
       importedCount: 0
     };
   } catch (err) {
@@ -260,6 +296,7 @@ export async function importKattisSolves(kattisUsername: string): Promise<{
   message?: string;
   totalSolved?: number;
   importedCount?: number;
+  matchedCount?: number;
 }> {
   const currentUser = get(user);
 
@@ -278,19 +315,69 @@ export async function importKattisSolves(kattisUsername: string): Promise<{
   }
 
   try {
+    console.log(`Fetching solved problems for Kattis user: ${kattisUsername}`);
+
     // Fetch user's solved problems from Kattis API
-    const response = await fetch(`/api/kattis/user-solves?username=${kattisUsername}`);
+    const response = await fetch(
+      `/api/kattis/user-solves?username=${encodeURIComponent(kattisUsername)}`
+    );
     const data = await response.json();
 
     if (!response.ok) {
+      console.error('Error response from Kattis API:', data);
       return {
         success: false,
         message: data.error || 'Failed to fetch solved problems from Kattis'
       };
     }
 
+    // Check if we got a valid response
+    if (!data.success) {
+      console.error('Error response from Kattis API:', data);
+
+      // Provide a more helpful error message for user not found
+      if (data.error && data.error.includes('not found on Kattis')) {
+        return {
+          success: false,
+          message: `User "${kattisUsername}" not found on Kattis. Please check that you've entered your Kattis username exactly as it appears in your profile URL. You can verify your username by checking if this link works: <a href="https://open.kattis.com/users/${kattisUsername}" target="_blank" rel="noopener noreferrer" class="text-[var(--color-accent)]">https://open.kattis.com/users/${kattisUsername}</a>`
+        };
+      }
+
+      return {
+        success: false,
+        message: data.error || 'Failed to fetch solved problems from Kattis'
+      };
+    }
+
+    // Check if solvedProblems array exists (it should, but just to be safe)
+    if (!data.solvedProblems) {
+      console.error('Invalid response from Kattis API:', data);
+      return {
+        success: false,
+        message: 'Invalid response from Kattis API'
+      };
+    }
+
+    // If the user has no solved problems, return early with success
+    if (data.solvedProblems.length === 0) {
+      console.log(`User ${kattisUsername} has no solved problems on Kattis`);
+      return {
+        success: true,
+        totalSolved: 0,
+        matchedCount: 0,
+        importedCount: 0
+      };
+    }
+
+    console.log(
+      `Found ${data.solvedProblems.length} solved problems for Kattis user: ${kattisUsername}`
+    );
+
     // Get all problems from our database
-    const { data: problems, error: problemsError } = await supabase.from('problems').select('*');
+    const { data: problems, error: problemsError } = await supabase
+      .from('problems')
+      .select('*')
+      .like('url', 'https://open.kattis.com/problems/%');
 
     if (problemsError) {
       console.error('Error fetching problems:', problemsError);
@@ -299,6 +386,8 @@ export async function importKattisSolves(kattisUsername: string): Promise<{
         message: `Error fetching problems: ${problemsError.message}`
       };
     }
+
+    console.log(`Found ${problems.length} Kattis problems in our database`);
 
     // Map problems by URL for easy lookup
     const problemsByUrl = new Map<string, Problem>();
@@ -320,6 +409,8 @@ export async function importKattisSolves(kattisUsername: string): Promise<{
         });
       }
     }
+
+    console.log(`Matched ${matchedProblems.length} problems with our database`);
 
     // Insert matched problems into user_solved_problems table
     if (matchedProblems.length > 0) {
@@ -343,6 +434,8 @@ export async function importKattisSolves(kattisUsername: string): Promise<{
         (item) => !existingSolvedIds.has(item.problem_id)
       );
 
+      console.log(`Found ${newSolvedProblems.length} new problems to mark as solved`);
+
       if (newSolvedProblems.length > 0) {
         const { error: insertError } = await supabase
           .from('user_solved_problems')
@@ -360,6 +453,7 @@ export async function importKattisSolves(kattisUsername: string): Promise<{
       return {
         success: true,
         totalSolved: solvedProblems.length,
+        matchedCount: matchedProblems.length,
         importedCount: newSolvedProblems.length
       };
     }
@@ -367,6 +461,7 @@ export async function importKattisSolves(kattisUsername: string): Promise<{
     return {
       success: true,
       totalSolved: solvedProblems.length,
+      matchedCount: matchedProblems.length,
       importedCount: 0
     };
   } catch (err) {
