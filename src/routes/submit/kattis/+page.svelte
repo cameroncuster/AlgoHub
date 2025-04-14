@@ -1,15 +1,15 @@
 <script lang="ts">
-  import ProblemSubmitForm from '$lib/components/ProblemSubmitForm.svelte';
-  import {
-    extractKattisProblemInfo,
-    fetchKattisProblemData,
-    formatKattisUrl,
-    extractKattisUrls
-  } from '$lib/services/kattis';
+import ProblemSubmitForm from '$lib/components/ProblemSubmitForm.svelte';
+import {
+  extractKattisProblemInfo,
+  fetchKattisProblemData,
+  formatKattisUrl,
+  extractKattisUrls
+} from '$lib/services/kattis';
 </script>
 
 <svelte:head>
-  <title>Submit Kattis Problems - AlgoHub</title>
+  <title>AlgoHub | Submit Kattis</title>
 </svelte:head>
 
 <ProblemSubmitForm

@@ -283,3 +283,263 @@ export function formatDuration(durationSeconds: number): string {
     return `${minutes}m`;
   }
 }
+
+/**
+ * Extract contest information from a Codeforces URL
+ * @param contestUrl - Codeforces contest URL
+ * @returns Contest info or null if invalid URL
+ */
+export function extractCodeforcesContestInfo(contestUrl: string): {
+  contestId: string;
+  isGym: boolean;
+  url: string;
+} | null {
+  // First normalize the URL to remove http/https/www and ensure it starts with a domain
+  const normalizedUrl = contestUrl.trim();
+
+  // Remove http/https/www if present
+  const cleanUrl = normalizedUrl.replace(/^(https?:\/\/)?(www\.)?/, '');
+
+  // Support both codeforces.com and mirror.codeforces.com
+  const contestPattern = /(?:mirror\.)?codeforces\.com\/contest\/(\d+)(?!\/problem\/)/;
+  const gymPattern = /(?:mirror\.)?codeforces\.com\/gym\/(\d+)(?!\/problem\/)/;
+
+  const contestMatch = cleanUrl.match(contestPattern);
+  const gymMatch = cleanUrl.match(gymPattern);
+
+  // Use whichever pattern matched
+  if (contestMatch) {
+    return {
+      contestId: contestMatch[1],
+      isGym: false,
+      url: `https://codeforces.com/contest/${contestMatch[1]}`
+    };
+  }
+
+  if (gymMatch) {
+    return {
+      contestId: gymMatch[1],
+      isGym: true,
+      url: `https://codeforces.com/gym/${gymMatch[1]}`
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Fetch contest data from Codeforces API
+ * @param contestInfo - Contest information
+ * @param submitterHandle - Handle of the person submitting the contest
+ * @returns Contest data
+ */
+export async function fetchCodeforcesContestData(
+  contestInfo: {
+    contestId: string;
+    isGym: boolean;
+    url: string;
+  },
+  submitterHandle: string = 'tourist'
+): Promise<{
+  success: boolean;
+  message?: string;
+  contest?: Omit<Contest, 'id' | 'dateAdded'>;
+}> {
+  try {
+    // Check if contest already exists in our database by URL
+    const { data: existingContests, error: checkError } = await supabase
+      .from('contests')
+      .select('id')
+      .eq('url', contestInfo.url);
+
+    if (checkError) {
+      return {
+        success: false,
+        message: `Error checking if contest exists: ${checkError.message}`
+      };
+    }
+
+    if (existingContests && existingContests.length > 0) {
+      return {
+        success: false,
+        message: 'Contest already exists in database'
+      };
+    }
+
+    // Define the interface for Codeforces contest data
+    interface CodeforcesContest {
+      id: number;
+      name: string;
+      type: string;
+      phase: string;
+      frozen: boolean;
+      durationSeconds: number;
+      startTimeSeconds?: number;
+      relativeTimeSeconds?: number;
+      preparedBy?: string;
+      websiteUrl?: string;
+      description?: string;
+      difficulty?: number;
+      kind?: string;
+      icpcRegion?: string;
+      country?: string;
+      city?: string;
+      season?: string;
+    }
+
+    // Fetch contest data from Codeforces API
+    const apiUrl = contestInfo.isGym
+      ? `https://codeforces.com/api/contest.standings?contestId=${contestInfo.contestId}&from=1&count=1&gym=true`
+      : `https://codeforces.com/api/contest.list?gym=false`;
+
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    if (data.status !== 'OK') {
+      throw new Error('Failed to fetch contest data from Codeforces API');
+    }
+
+    let contestData: CodeforcesContest | null = null;
+
+    if (contestInfo.isGym) {
+      // For gym contests, the data is in the contest field
+      contestData = data.result.contest;
+    } else {
+      // For regular contests, we need to find the contest in the list
+      contestData = data.result.find(
+        (c: CodeforcesContest) => c.id.toString() === contestInfo.contestId
+      );
+    }
+
+    if (!contestData) {
+      throw new Error('Contest not found in Codeforces API response');
+    }
+
+    // Determine contest type
+    let contestType = 'Codeforces';
+    if (contestInfo.isGym) {
+      contestType = 'ICPC'; // Default for gym contests
+      // Try to extract more specific type from name or kind
+      if (contestData.kind && contestData.kind.includes('ICPC')) {
+        contestType = 'ICPC';
+      }
+    } else if (
+      contestData.name.includes('ICPC') ||
+      (contestData.kind && contestData.kind.includes('ICPC'))
+    ) {
+      contestType = 'ICPC';
+    }
+
+    return {
+      success: true,
+      contest: {
+        name: contestData.name,
+        url: contestInfo.url,
+        durationSeconds: contestData.durationSeconds,
+        difficulty: contestData.difficulty,
+        addedBy: submitterHandle || 'tourist',
+        addedByUrl: submitterHandle
+          ? `https://codeforces.com/profile/${submitterHandle}`
+          : 'https://codeforces.com/profile/tourist',
+        likes: 0,
+        dislikes: 0,
+        type: contestType
+      }
+    };
+  } catch (err) {
+    console.error('Error fetching contest data:', err);
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : 'Unknown error'
+    };
+  }
+}
+
+/**
+ * Insert a contest into the database
+ * @param contest - Contest data to insert
+ * @returns Object with success flag and optional message
+ */
+export async function insertContest(contest: Omit<Contest, 'id' | 'dateAdded'>): Promise<{
+  success: boolean;
+  message?: string;
+  id?: string;
+}> {
+  try {
+    // Map camelCase field names to snake_case column names
+    const dbContest = {
+      name: contest.name,
+      url: contest.url,
+      type: contest.type,
+      duration_seconds: contest.durationSeconds,
+      added_by: contest.addedBy,
+      added_by_url: contest.addedByUrl,
+      likes: contest.likes,
+      dislikes: contest.dislikes
+    };
+
+    // Create a properly typed object with optional fields
+    interface DbContest {
+      name: string;
+      url: string;
+      type: string | undefined;
+      duration_seconds: number;
+      added_by: string;
+      added_by_url: string;
+      likes: number;
+      dislikes: number;
+      difficulty?: number;
+    }
+
+    // Add difficulty only if defined
+    const dbContestWithOptionals: DbContest = dbContest as DbContest;
+    if (contest.difficulty !== undefined) {
+      dbContestWithOptionals.difficulty = contest.difficulty;
+    }
+
+    // Check if the contest already exists by URL
+    const { data: existingContests, error: checkError } = await supabase
+      .from('contests')
+      .select('id')
+      .eq('url', contest.url);
+
+    if (checkError) {
+      return {
+        success: false,
+        message: `Error checking if contest exists: ${checkError.message}`
+      };
+    }
+
+    if (existingContests && existingContests.length > 0) {
+      return {
+        success: false,
+        message: 'Contest already exists in database'
+      };
+    }
+
+    // Insert the contest
+    const { data, error } = await supabase
+      .from('contests')
+      .insert(dbContestWithOptionals)
+      .select('id')
+      .single();
+
+    if (error) {
+      return {
+        success: false,
+        message: `Database error: ${error.message}`
+      };
+    }
+
+    return {
+      success: true,
+      id: data?.id
+    };
+  } catch (err) {
+    console.error('Error inserting contest:', err);
+    return {
+      success: false,
+      message: err instanceof Error ? err.message : 'Unknown error inserting contest'
+    };
+  }
+}
