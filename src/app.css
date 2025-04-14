@@ -44,6 +44,11 @@
     --color-pupil: oklch(0.51 0.18 142.5);
     --color-newbie: oklch(0.54 0 0);
 
+    /* Leaderboard rank colors */
+    --color-leaderboard-first: rgb(214, 175, 54);
+    --color-leaderboard-second: rgb(167, 167, 173);
+    --color-leaderboard-third: rgb(167, 112, 68);
+
     /* Spacing */
     --spacing: 0.25rem;
 
