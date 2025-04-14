@@ -208,18 +208,31 @@ $: if ($page) {
             >About</a
           >
         </li>
-        {#if $user && isUserAdmin}
+        {#if $user}
           <li
-            class="relative {$page.url.pathname === '/submit'
+            class="relative {$page.url.pathname === '/import'
               ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
               : ''}"
           >
             <a
-              href="/submit"
+              href="/import"
               class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
-              >Submit</a
+              >Import</a
             >
           </li>
+          {#if isUserAdmin}
+            <li
+              class="relative {$page.url.pathname === '/submit'
+                ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
+                : ''}"
+            >
+              <a
+                href="/submit"
+                class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+                >Submit</a
+              >
+            </li>
+          {/if}
         {/if}
       </ul>
       <div
@@ -291,14 +304,23 @@ $: if ($page) {
               >About</a
             >
           </li>
-          {#if $user && isUserAdmin}
+          {#if $user}
             <li>
               <a
-                href="/submit"
-                class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] {$page.url.pathname === '/submit' ? 'text-[var(--color-accent)]' : ''}"
-                >Submit</a
+                href="/import"
+                class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] {$page.url.pathname === '/import' ? 'text-[var(--color-accent)]' : ''}"
+                >Import</a
               >
             </li>
+            {#if isUserAdmin}
+              <li>
+                <a
+                  href="/submit"
+                  class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] {$page.url.pathname === '/submit' ? 'text-[var(--color-accent)]' : ''}"
+                  >Submit</a
+                >
+              </li>
+            {/if}
           {/if}
         </ul>
         <div

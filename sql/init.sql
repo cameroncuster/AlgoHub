@@ -10,6 +10,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Authentication and user management
 \i auth/user_roles.sql
 \i auth/user_triggers.sql
+\i auth/user_platform_usernames.sql
 
 -- Problem-related tables and functions
 \i problems/problems.sql
