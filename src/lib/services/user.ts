@@ -77,9 +77,9 @@ export async function updateUserPreferences(preferences: UserPreferences): Promi
       .select('id')
       .eq('user_id', currentUser.id)
       .single();
-    
+
     let result;
-    
+
     if (existingData) {
       // Update existing record
       result = await supabase
@@ -91,14 +91,12 @@ export async function updateUserPreferences(preferences: UserPreferences): Promi
         .eq('user_id', currentUser.id);
     } else {
       // Insert new record
-      result = await supabase
-        .from('user_preferences')
-        .insert({
-          user_id: currentUser.id,
-          hide_from_leaderboard: preferences.hideFromLeaderboard,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
+      result = await supabase.from('user_preferences').insert({
+        user_id: currentUser.id,
+        hide_from_leaderboard: preferences.hideFromLeaderboard,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
     }
 
     if (result.error) {
@@ -106,8 +104,8 @@ export async function updateUserPreferences(preferences: UserPreferences): Promi
       // try one more time with an update
       if (result.error.code === '23505') {
         // Wait a moment before retrying
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         result = await supabase
           .from('user_preferences')
           .update({
@@ -115,7 +113,7 @@ export async function updateUserPreferences(preferences: UserPreferences): Promi
             updated_at: new Date().toISOString()
           })
           .eq('user_id', currentUser.id);
-          
+
         if (result.error) {
           return false;
         }
