@@ -209,7 +209,7 @@
       <li class="mb-2 leading-relaxed">
         <a href="https://github.com/the-tourist/algo" target="_blank" rel="noopener noreferrer"
           >tourist's Algorithms</a
-        > - Library by one of the world's top competitive programmers
+        > - Library by the world's top competitive programmer
       </li>
       <li class="mb-2 leading-relaxed">
         <a
