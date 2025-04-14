@@ -1,8 +1,9 @@
 /**
- * Service for providing programming problems data
+ * Service for providing programming problems data from Codeforces
  */
 import type { Problem } from './problem';
 import { checkProblemExists } from './problem';
+import { extractCodeforcesContestInfo } from './contest';
 
 // Type for Codeforces API problem response
 interface CodeforcesProblem {
@@ -15,7 +16,7 @@ interface CodeforcesProblem {
 
 /**
  * Extract problem information from a Codeforces URL
- * @param problemUrl - Codeforces problem URL or shorthand format
+ * @param problemUrl - Codeforces problem URL
  * @returns Problem info or null if invalid URL
  */
 export function extractCodeforcesProblemInfo(problemUrl: string): {
@@ -26,32 +27,6 @@ export function extractCodeforcesProblemInfo(problemUrl: string): {
 } | null {
   // First normalize the URL to remove http/https/www and ensure it starts with a domain
   const normalizedUrl = problemUrl.trim();
-
-  // Handle shorthand "CF" format (e.g., "CF 1794E")
-  const cfShortPattern = /^CF\s*(\d+)([A-Z\d]+)$/i;
-  const cfShortMatch = normalizedUrl.match(cfShortPattern);
-  if (cfShortMatch) {
-    const normalizedFinalUrl = `https://codeforces.com/contest/${cfShortMatch[1]}/problem/${cfShortMatch[2]}`;
-    return {
-      contestId: cfShortMatch[1],
-      index: cfShortMatch[2],
-      problemId: `${cfShortMatch[1]}${cfShortMatch[2]}`,
-      url: normalizedFinalUrl
-    };
-  }
-
-  // Handle shorthand "GYM" format (e.g., "GYM 102253C")
-  const gymShortPattern = /^GYM\s*(\d+)([A-Z\d]+)$/i;
-  const gymShortMatch = normalizedUrl.match(gymShortPattern);
-  if (gymShortMatch) {
-    const normalizedFinalUrl = `https://codeforces.com/gym/${gymShortMatch[1]}/problem/${gymShortMatch[2]}`;
-    return {
-      contestId: gymShortMatch[1],
-      index: gymShortMatch[2],
-      problemId: `G${gymShortMatch[1]}${gymShortMatch[2]}`, // Prefix with 'G' to indicate gym problem
-      url: normalizedFinalUrl
-    };
-  }
 
   // Remove http/https/www if present
   const cleanUrl = normalizedUrl.replace(/^(https?:\/\/)?(www\.)?/, '');
@@ -213,6 +188,16 @@ export async function fetchCodeforcesProblemData(
 }
 
 export function formatCodeforcesUrl(url: string, name?: string): string {
+  // Handle gym URLs
+  if (url.includes('/gym/')) {
+    const shortUrl = url.replace(
+      /^https?:\/\/(?:www\.)?codeforces\.com\/gym\/(\d+)\/(?:problem\/)?([A-Z\d]+).*$/,
+      'GYM $1$2'
+    );
+    return name ? `${shortUrl} - ${name}` : shortUrl;
+  }
+
+  // Handle regular contest URLs
   const shortUrl = url.replace(
     /^https?:\/\/(?:www\.)?codeforces\.com\/(?:contest|problemset\/problem)\/(\d+)\/(?:problem\/)?([A-Z\d]+).*$/,
     'CF $1$2'
@@ -221,22 +206,48 @@ export function formatCodeforcesUrl(url: string, name?: string): string {
   return name ? `${shortUrl} - ${name}` : shortUrl;
 }
 
-export function extractCodeforcesUrls(text: string): string[] {
-  // Split by newlines or spaces to handle both formats
-  const lines = text.split(/[\n\s]+/).filter((line) => line.trim());
+/**
+ * Extract Codeforces URLs from text
+ * @param text - Text containing URLs
+ * @returns Object with problem and contest URLs
+ */
+export function extractCodeforcesUrls(text: string): {
+  problemUrls: string[];
+  contestUrls: string[];
+} {
+  // Split by any whitespace (spaces, newlines, tabs) to handle multiple URLs
+  const lines = text.split(/\s+/).filter((line) => line.trim());
 
-  const validUrls: string[] = [];
+  const problemUrls: string[] = [];
+  const contestUrls: string[] = [];
 
   for (const line of lines) {
-    // Skip empty lines
-    if (!line.trim()) continue;
+    // Skip empty lines or comment lines
+    if (!line.trim() || line.trim().startsWith('#')) continue;
 
     // Try to extract problem info for each line
-    const info = extractCodeforcesProblemInfo(line.trim());
-    if (info) {
-      validUrls.push(info.url);
+    const problemInfo = extractCodeforcesProblemInfo(line.trim());
+    if (problemInfo) {
+      problemUrls.push(problemInfo.url);
+      continue;
+    }
+
+    // If not a problem, try to extract contest info
+    const contestInfo = extractCodeforcesContestInfo(line.trim());
+    if (contestInfo) {
+      contestUrls.push(contestInfo.url);
     }
   }
 
-  return validUrls;
+  return { problemUrls, contestUrls };
+}
+
+/**
+ * Extract all URLs from text (for backward compatibility)
+ * @param text - Text containing URLs
+ * @returns Array of all URLs (problems and contests)
+ */
+export function extractAllCodeforcesUrls(text: string): string[] {
+  const { problemUrls, contestUrls } = extractCodeforcesUrls(text);
+  return [...problemUrls, ...contestUrls];
 }
