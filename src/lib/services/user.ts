@@ -42,7 +42,6 @@ export async function fetchUserPreferences(): Promise<UserPreferences | null> {
       .single();
 
     if (error) {
-      console.error('Error fetching user preferences:', error);
       return null;
     }
 
@@ -55,7 +54,6 @@ export async function fetchUserPreferences(): Promise<UserPreferences | null> {
       hideFromLeaderboard: record.hide_from_leaderboard
     };
   } catch (err) {
-    console.error('Failed to fetch user preferences:', err);
     return null;
   }
 }
@@ -69,49 +67,44 @@ export async function updateUserPreferences(preferences: UserPreferences): Promi
   const currentUser = get(user);
 
   if (!currentUser) {
-    console.error('No current user found');
     return false;
   }
 
-  console.log('Current user:', currentUser.id);
-  console.log('Updating preferences with:', {
-    user_id: currentUser.id,
-    hide_from_leaderboard: preferences.hideFromLeaderboard
-  });
-
   try {
-    // Try to update first (most likely scenario)
-    let result = await supabase
+    // First check if a record exists
+    const { data: existingData } = await supabase
       .from('user_preferences')
-      .update({
-        hide_from_leaderboard: preferences.hideFromLeaderboard,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', currentUser.id);
+      .select('id')
+      .eq('user_id', currentUser.id)
+      .single();
     
-    console.log('Update result:', result);
+    let result;
     
-    // If no rows were affected, try to insert
-    if (result.error || result.count === 0) {
-      console.log('No rows updated, trying insert');
-      
-      // Try to insert a new record
+    if (existingData) {
+      // Update existing record
+      result = await supabase
+        .from('user_preferences')
+        .update({
+          hide_from_leaderboard: preferences.hideFromLeaderboard,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', currentUser.id);
+    } else {
+      // Insert new record
       result = await supabase
         .from('user_preferences')
         .insert({
           user_id: currentUser.id,
-          hide_from_leaderboard: preferences.hideFromLeaderboard
+          hide_from_leaderboard: preferences.hideFromLeaderboard,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         });
-      
-      console.log('Insert result:', result);
     }
 
     if (result.error) {
       // If we still have an error and it's a duplicate key error,
       // try one more time with an update
       if (result.error.code === '23505') {
-        console.log('Duplicate key error, trying update one more time');
-        
         // Wait a moment before retrying
         await new Promise(resolve => setTimeout(resolve, 100));
         
@@ -123,34 +116,16 @@ export async function updateUserPreferences(preferences: UserPreferences): Promi
           })
           .eq('user_id', currentUser.id);
           
-        console.log('Final update result:', result);
-        
         if (result.error) {
-          console.error('Error in final update attempt:', result.error);
           return false;
         }
       } else {
-        console.error('Error updating user preferences:', result.error);
         return false;
       }
     }
 
-    // Verify the update by fetching the current value
-    const { data: verifyData, error: verifyError } = await supabase
-      .from('user_preferences')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .single();
-
-    console.log('Verification fetch:', { data: verifyData, error: verifyError });
-
-    if (verifyError) {
-      console.error('Error verifying update:', verifyError);
-    }
-
     return true;
   } catch (err) {
-    console.error('Failed to update user preferences:', err);
     return false;
   }
 }
