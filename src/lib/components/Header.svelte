@@ -168,57 +168,57 @@ $: if ($page) {
       <ul class="m-0 flex list-none gap-2 p-0 lg:gap-3 xl:gap-4">
         <li
           class="relative {$page.url.pathname === '/'
-            ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
+            ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:shadow-[0_0_8px_var(--color-accent)] after:content-['']"
             : ''}"
         >
           <a
             href="/"
-            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
+            class="hover:text-shadow-sm block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-all duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >Problems</a
           >
         </li>
         <li
           class="relative {$page.url.pathname === '/contests'
-            ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
+            ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:shadow-[0_0_8px_var(--color-accent)] after:content-['']"
             : ''}"
         >
           <a
             href="/contests"
-            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
+            class="hover:text-shadow-sm block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-all duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >Contests</a
           >
         </li>
         <li
           class="relative {$page.url.pathname === '/leaderboard'
-            ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
+            ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:shadow-[0_0_8px_var(--color-accent)] after:content-['']"
             : ''}"
         >
           <a
             href="/leaderboard"
-            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
+            class="hover:text-shadow-sm block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-all duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >Leaderboard</a
           >
         </li>
         <li
           class="relative {$page.url.pathname === '/about'
-            ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
+            ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:shadow-[0_0_8px_var(--color-accent)] after:content-['']"
             : ''}"
         >
           <a
             href="/about"
-            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
+            class="hover:text-shadow-sm block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-all duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >About</a
           >
         </li>
         {#if $user && isUserAdmin}
           <li
             class="relative {$page.url.pathname === '/submit'
-              ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
+              ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:shadow-[0_0_8px_var(--color-accent)] after:content-['']"
               : ''}"
           >
             <a
               href="/submit"
-              class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
+              class="hover:text-shadow-sm block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-all duration-200 hover:text-[var(--color-accent)] lg:text-base"
               >Submit</a
             >
           </li>
@@ -242,7 +242,7 @@ $: if ($page) {
             </a>
             <a
               href="/settings"
-              class="flex items-center justify-center rounded-full p-1.5 text-[var(--color-text)] transition-colors hover:bg-[var(--color-tertiary)] hover:text-[var(--color-accent)]"
+              class="flex items-center justify-center rounded-full p-1.5 text-[var(--color-text)] transition-all duration-300 hover:bg-[var(--color-tertiary)] hover:text-[var(--color-accent)] hover:shadow-[0_0_8px_var(--color-accent)]"
               title="Settings"
               aria-label="Settings"
             >
@@ -264,7 +264,7 @@ $: if ($page) {
               </svg>
             </a>
             <button
-              class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,black_5%,transparent)]"
+              class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_80%,transparent)] hover:text-[var(--color-heading)]"
               on:click={handleLogout}
             >
               Logout
@@ -272,7 +272,7 @@ $: if ($page) {
           </div>
         {:else}
           <button
-            class="cursor-pointer rounded border border-[#4285f4] bg-[#4285f4] px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:border-[#3367d6] hover:bg-[#3367d6] hover:shadow"
+            class="cursor-pointer rounded border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:border-[color-mix(in_oklab,var(--color-accent)_80%,white)] hover:bg-[color-mix(in_oklab,var(--color-accent)_80%,white)] hover:shadow"
             on:click={handleLogin}
             title="Login with GitHub"
           >
@@ -286,35 +286,35 @@ $: if ($page) {
   <!-- Mobile menu -->
   {#if mobileMenuOpen}
     <div
-      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-md lg:hidden"
+      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-md backdrop-blur-sm lg:hidden"
     >
       <nav class="flex flex-col gap-4">
         <ul class="m-0 flex list-none flex-col gap-4 p-0">
           <li>
             <a
               href="/"
-              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] {$page.url.pathname === '/' ? 'text-[var(--color-accent)]' : ''}"
+              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-all duration-200 hover:translate-x-1 hover:text-[var(--color-accent)] {$page.url.pathname === '/' ? 'text-[var(--color-accent)]' : ''}"
               >Problems</a
             >
           </li>
           <li>
             <a
               href="/contests"
-              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] {$page.url.pathname === '/contests' ? 'text-[var(--color-accent)]' : ''}"
+              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-all duration-200 hover:translate-x-1 hover:text-[var(--color-accent)] {$page.url.pathname === '/contests' ? 'text-[var(--color-accent)]' : ''}"
               >Contests</a
             >
           </li>
           <li>
             <a
               href="/leaderboard"
-              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] {$page.url.pathname === '/leaderboard' ? 'text-[var(--color-accent)]' : ''}"
+              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-all duration-200 hover:translate-x-1 hover:text-[var(--color-accent)] {$page.url.pathname === '/leaderboard' ? 'text-[var(--color-accent)]' : ''}"
               >Leaderboard</a
             >
           </li>
           <li>
             <a
               href="/about"
-              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] {$page.url.pathname === '/about' ? 'text-[var(--color-accent)]' : ''}"
+              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-all duration-200 hover:translate-x-1 hover:text-[var(--color-accent)] {$page.url.pathname === '/about' ? 'text-[var(--color-accent)]' : ''}"
               >About</a
             >
           </li>
@@ -322,7 +322,7 @@ $: if ($page) {
             <li>
               <a
                 href="/submit"
-                class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] {$page.url.pathname === '/submit' ? 'text-[var(--color-accent)]' : ''}"
+                class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-all duration-200 hover:translate-x-1 hover:text-[var(--color-accent)] {$page.url.pathname === '/submit' ? 'text-[var(--color-accent)]' : ''}"
                 >Submit</a
               >
             </li>
@@ -344,7 +344,7 @@ $: if ($page) {
               </a>
               <a
                 href="/settings"
-                class="flex items-center justify-center rounded-full p-1.5 text-[var(--color-text)] transition-colors hover:bg-[var(--color-tertiary)] hover:text-[var(--color-accent)]"
+                class="flex items-center justify-center rounded-full p-1.5 text-[var(--color-text)] transition-all duration-300 hover:bg-[var(--color-tertiary)] hover:text-[var(--color-accent)] hover:shadow-[0_0_8px_var(--color-accent)]"
                 title="Settings"
                 aria-label="Settings"
               >
@@ -367,14 +367,14 @@ $: if ($page) {
               </a>
             </div>
             <button
-              class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,black_5%,transparent)]"
+              class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_80%,transparent)] hover:text-[var(--color-heading)]"
               on:click={handleLogout}
             >
               Logout
             </button>
           {:else}
             <button
-              class="cursor-pointer rounded border border-[#4285f4] bg-[#4285f4] px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:border-[#3367d6] hover:bg-[#3367d6] hover:shadow"
+              class="cursor-pointer rounded border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:border-[color-mix(in_oklab,var(--color-accent)_80%,white)] hover:bg-[color-mix(in_oklab,var(--color-accent)_80%,white)] hover:shadow"
               on:click={handleLogin}
               title="Login with GitHub"
             >
@@ -417,5 +417,10 @@ a[href*='github.com'] {
 
 a[href*='github.com']:hover {
   color: color-mix(in oklab, var(--color-username) 80%, white) !important;
+}
+
+/* Text shadow utility */
+.hover\:text-shadow-sm:hover {
+  text-shadow: 0 0 8px var(--color-accent);
 }
 </style>
