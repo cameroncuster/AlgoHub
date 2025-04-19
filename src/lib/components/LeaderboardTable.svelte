@@ -11,22 +11,26 @@ function formatNumber(num: number): string {
 </script>
 
 <div class="mt-4 w-full">
-  <div class="table-wrapper rounded-lg bg-[var(--color-secondary)] shadow-sm">
-    <table class="w-full table-fixed border-collapse overflow-hidden bg-[var(--color-secondary)]">
+  <div
+    class="table-wrapper rounded-md border-2 border-[var(--color-border)] bg-[var(--color-secondary)] shadow-[2px_2px_0_rgba(0,0,0,0.1)]"
+  >
+    <table
+      class="w-full table-fixed border-collapse overflow-hidden bg-[var(--color-secondary)] font-mono text-sm"
+    >
       <thead>
         <tr>
           <th
-            class="sticky top-0 z-10 w-[15%] bg-[var(--color-tertiary)] p-2 text-center font-bold sm:w-[10%] sm:p-3"
+            class="sticky top-0 z-10 w-[15%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-2 text-center font-bold sm:w-[10%] sm:p-3"
           >
             Rank
           </th>
           <th
-            class="sticky top-0 z-10 w-[55%] bg-[var(--color-tertiary)] p-2 text-left font-bold sm:w-[60%] sm:p-3"
+            class="sticky top-0 z-10 w-[55%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-2 text-left font-bold sm:w-[60%] sm:p-3"
           >
             User
           </th>
           <th
-            class="sticky top-0 z-10 w-[30%] bg-[var(--color-tertiary)] p-2 text-center font-bold sm:p-3"
+            class="sticky top-0 z-10 w-[30%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-2 text-center font-bold sm:p-3"
           >
             Solves
           </th>
@@ -35,25 +39,25 @@ function formatNumber(num: number): string {
       <tbody>
         {#each leaderboardEntries as entry}
           <tr
-            class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0 hover:bg-black/5"
+            class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0 hover:bg-[var(--color-tertiary)]/30"
           >
             <td class="p-2 text-center sm:p-3">
               <!-- Rank with special styling for top 3 -->
               {#if entry.rank === 1}
                 <span
-                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-legendary-grandmaster)] font-bold text-white"
+                  class="inline-flex h-8 w-8 items-center justify-center rounded bg-[var(--color-legendary-grandmaster)] font-bold text-white shadow-[1px_1px_0_rgba(0,0,0,0.1)]"
                 >
                   {entry.rank}
                 </span>
               {:else if entry.rank === 2}
                 <span
-                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-specialist)] font-bold text-white"
+                  class="inline-flex h-8 w-8 items-center justify-center rounded bg-[var(--color-specialist)] font-bold text-white shadow-[1px_1px_0_rgba(0,0,0,0.1)]"
                 >
                   {entry.rank}
                 </span>
               {:else if entry.rank === 3}
                 <span
-                  class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-pupil)] font-bold text-white"
+                  class="inline-flex h-8 w-8 items-center justify-center rounded bg-[var(--color-pupil)] font-bold text-white shadow-[1px_1px_0_rgba(0,0,0,0.1)]"
                 >
                   {entry.rank}
                 </span>
@@ -67,11 +71,11 @@ function formatNumber(num: number): string {
                   <img
                     src={entry.avatarUrl}
                     alt={entry.username}
-                    class="h-8 w-8 rounded-full border border-[var(--color-border)] sm:h-10 sm:w-10"
+                    class="h-8 w-8 rounded border-2 border-[var(--color-border)] sm:h-10 sm:w-10"
                   />
                 {:else}
                   <div
-                    class="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-tertiary)] text-xs font-medium sm:h-10 sm:w-10 sm:text-sm"
+                    class="flex h-8 w-8 items-center justify-center rounded bg-[var(--color-tertiary)] text-xs font-medium shadow-[1px_1px_0_rgba(0,0,0,0.1)] sm:h-10 sm:w-10 sm:text-sm"
                   >
                     {entry.username.substring(0, 2).toUpperCase()}
                   </div>

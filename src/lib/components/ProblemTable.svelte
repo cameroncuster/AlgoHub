@@ -206,7 +206,7 @@ function getDifficultyTooltip(problem: Problem): string {
                   <div class="relative">
                     <img src={codeforcesLogo} alt="Codeforces" class="h-5 w-5 object-contain" />
                     <div
-                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded-full border border-white bg-[#3B5998]"
+                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded border border-white bg-[#3B5998]"
                     ></div>
                   </div>
                 </span>
@@ -215,7 +215,7 @@ function getDifficultyTooltip(problem: Problem): string {
                   <div class="relative">
                     <img src={kattisLogo} alt="Kattis" class="h-5 w-5 object-contain" />
                     <div
-                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded-full border border-white bg-[#f2ae00]"
+                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded border border-white bg-[#f2ae00]"
                     ></div>
                   </div>
                 </span>
@@ -300,8 +300,8 @@ function getDifficultyTooltip(problem: Problem): string {
                 <button
                   class={`flex h-8 w-8 cursor-pointer items-center justify-center rounded shadow-[1px_1px_0_rgba(0,0,0,0.1)] transition-all duration-300
                     ${isSolved
-                      ? 'solved-button bg-[rgb(34_197_94)] text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]'
-                      : 'border-2 border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(34_197_94)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)] hover:shadow-[0_0_5px_rgba(34,197,94,0.2)]'
+                      ? 'bg-[rgb(34_197_94)] text-white'
+                      : 'border-2 border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(34_197_94)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)]'
                     } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
                   on:click={() => isAuthenticated && onToggleSolved(problem.id!, !isSolved)}
                   title={!isAuthenticated
@@ -504,22 +504,18 @@ td:last-child {
   width: 100%;
 }
 
-/* Add subtle animation for solved problems */
+/* Basic styling for elements */
 tr {
   overflow: hidden;
 }
 
-/* Checkmark animation */
-.solved-button {
-  animation: pulse 1.5s infinite alternate;
+/* Button transitions */
+button {
+  transition: all 0.2s ease;
 }
 
 .checkmark-icon {
-  transition: transform 0.3s ease;
-}
-
-.solved-button .checkmark-icon {
-  transform: scale(1.1);
+  transition: transform 0.2s ease;
 }
 
 /* Sortable header styles */
@@ -543,14 +539,5 @@ a[href*='github.com']:hover {
 /* Add pixel-style border to buttons on hover */
 button:hover {
   transform: translateY(1px);
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 5px rgba(34, 197, 94, 0.4);
-  }
-  100% {
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
-  }
 }
 </style>

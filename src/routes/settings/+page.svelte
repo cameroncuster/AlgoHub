@@ -6,6 +6,7 @@ import { fetchUserPreferences, updateUserPreferences } from '$lib/services/user'
 import type { UserPreferences } from '$lib/services/user';
 import type { Unsubscriber } from 'svelte/store';
 import { supabase } from '$lib/services/database';
+import ThemeSwitcher from '$lib/components/ThemeSwitcher.svelte';
 
 let preferences: UserPreferences = {
   hideFromLeaderboard: false
@@ -267,5 +268,37 @@ onMount(() => {
         </div>
       </div>
     </div>
+
+    <!-- Theme Settings Section -->
+    {#if !loading}
+      <div class="mt-6 overflow-hidden rounded">
+        <div class="border-b border-[var(--color-border)] bg-[var(--color-tertiary)] p-4">
+          <div class="flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-[var(--color-text-muted)]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+              />
+            </svg>
+            <span class="font-bold text-[var(--color-heading)]">Theme</span>
+          </div>
+        </div>
+
+        <div class="bg-[var(--color-secondary)] p-4">
+          <ThemeSwitcher />
+          <p class="mt-2 text-sm text-[var(--color-text-muted)]">
+            Choose your preferred theme. Your selection will be remembered when you return.
+          </p>
+        </div>
+      </div>
+    {/if}
   {/if}
 </div>

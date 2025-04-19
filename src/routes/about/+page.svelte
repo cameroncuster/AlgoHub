@@ -9,7 +9,7 @@
 
 <div class="mx-auto max-w-3xl px-4 py-8">
   <section class="mb-10">
-    <h2 class="text-accent mb-4 text-2xl">gitgud</h2>
+    <h2 class="mb-4 text-2xl text-[var(--color-accent)]">gitgud.cc</h2>
     <p class="mb-4 leading-relaxed">
       gitgud is a collection of hand-picked problems. If you are new to competitive programming you
       can learn the fundamentals at some of these sites:
@@ -113,7 +113,7 @@
       </li>
     </ul>
 
-    <h3 class="text-accent mb-4 text-xl">Optimized for ICPC</h3>
+    <h3 class="mb-4 text-xl text-[var(--color-accent)]">Optimized for ICPC</h3>
     <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a
@@ -245,7 +245,7 @@
   </section>
 
   <section class="mb-10">
-    <h2 class="text-accent mb-4 text-2xl">Contribute</h2>
+    <h2 class="mb-4 text-2xl text-[var(--color-accent)]">Contribute</h2>
     <p class="mb-4 leading-relaxed">
       gitgud is an open-source project, and we welcome contributions from the community. If you'd
       like to help improve gitgud, please check out our <a
