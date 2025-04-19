@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-  <title>gitgud | About</title>
+  <title>About</title>
   <meta name="description" content="About this app" />
 </svelte:head>
 
