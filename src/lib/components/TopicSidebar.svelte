@@ -62,7 +62,7 @@ onMount(() => {
 
 <!-- Mobile sidebar toggle -->
 <button
-  class="sidebar-toggle fixed bottom-6 left-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-primary)] text-white shadow-lg transition-transform hover:scale-105 active:scale-95 md:hidden"
+  class="sidebar-toggle fixed bottom-6 left-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-accent)] text-white shadow-lg transition-transform hover:scale-105 active:scale-95 md:hidden"
   on:click={onToggle}
   aria-label="Toggle filters"
 >
@@ -99,14 +99,14 @@ onMount(() => {
 
 <!-- Desktop sidebar (always visible) -->
 <div
-  class="absolute top-[60px] bottom-auto left-0 hidden w-[13rem] bg-[var(--color-primary)] md:block"
+  class="absolute top-[60px] left-0 hidden h-auto w-[13rem] border-r border-[var(--color-border)] bg-[var(--color-secondary)] md:block"
 >
-  <div class="h-[calc(100vh-140px)] overflow-y-auto">
+  <div class="max-h-[calc(100vh-140px)] overflow-y-auto">
     <div class="w-full space-y-1 p-3">
       <button
-        class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
+        class={`w-full rounded-sm px-3 py-2 text-left transition-all duration-200 ${
           selectedTopic === null
-            ? 'scale-102 bg-[var(--color-secondary)] text-white shadow-sm'
+            ? 'scale-102 bg-[var(--color-accent)] text-white shadow-sm'
             : 'text-[var(--color-text)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:shadow-sm'
         }`}
         on:click={() => onSelectTopic(null)}
@@ -116,9 +116,9 @@ onMount(() => {
 
       {#each topics as topic}
         <button
-          class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
+          class={`w-full rounded-sm px-3 py-2 text-left transition-all duration-200 ${
             selectedTopic === topic
-              ? 'scale-102 bg-[var(--color-secondary)] text-white shadow-sm'
+              ? 'scale-102 bg-[var(--color-accent)] text-white shadow-sm'
               : 'text-[var(--color-text)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:shadow-sm'
           }`}
           on:click={() => onSelectTopic(topic)}
@@ -138,9 +138,9 @@ onMount(() => {
   <div class="h-full overflow-y-auto p-4 pt-16">
     <div class="space-y-1">
       <button
-        class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
+        class={`w-full rounded-sm px-3 py-2 text-left transition-all duration-200 ${
           selectedTopic === null
-            ? 'scale-102 bg-[var(--color-primary)] text-white shadow-sm'
+            ? 'scale-102 bg-[var(--color-accent)] text-white shadow-sm'
             : 'text-[var(--color-text)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:shadow-sm'
         }`}
         on:click={() => onSelectTopic(null)}
@@ -150,9 +150,9 @@ onMount(() => {
 
       {#each topics as topic}
         <button
-          class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
+          class={`w-full rounded-sm px-3 py-2 text-left transition-all duration-200 ${
             selectedTopic === topic
-              ? 'scale-102 bg-[var(--color-primary)] text-white shadow-sm'
+              ? 'scale-102 bg-[var(--color-accent)] text-white shadow-sm'
               : 'text-[var(--color-text)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:shadow-sm'
           }`}
           on:click={() => onSelectTopic(topic)}
@@ -187,12 +187,12 @@ onMount(() => {
   transform: scale(1.02);
 }
 
-/* Ensure sidebar doesn't overlap footer */
+/* Ensure sidebar has proper styling */
 @media (min-width: 768px) {
   /* Desktop styles */
   div[class*='absolute top-[60px]'] {
     height: auto;
-    min-height: calc(100vh - 140px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
 }
 </style>

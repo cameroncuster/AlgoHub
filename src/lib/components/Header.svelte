@@ -123,7 +123,9 @@ $: if ($page) {
 }
 </script>
 
-<header class="sticky top-0 z-50 w-full bg-[var(--color-secondary)] py-3 shadow-sm">
+<header
+  class="sticky top-0 z-50 w-full border-b border-[var(--color-border)] bg-[var(--color-secondary)] py-3 shadow-sm"
+>
   <div class="mx-auto flex max-w-[1200px] items-center justify-between px-3 sm:px-4 md:px-5">
     <div class="flex items-center">
       <a
@@ -140,7 +142,7 @@ $: if ($page) {
 
     <!-- Mobile menu button -->
     <button
-      class="flex items-center rounded-md border border-[var(--color-border)] px-2 py-1 text-[var(--color-text)] lg:hidden"
+      class="flex items-center rounded border border-[var(--color-border)] px-2 py-1 text-[var(--color-text)] transition-colors duration-200 hover:bg-[var(--color-tertiary)] lg:hidden"
       aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
       on:click={toggleMobileMenu}
     >
@@ -264,7 +266,7 @@ $: if ($page) {
               </svg>
             </a>
             <button
-              class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,black_5%,transparent)]"
+              class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:border-[var(--color-accent)] hover:bg-[var(--color-tertiary)]"
               on:click={handleLogout}
             >
               Logout
@@ -272,7 +274,7 @@ $: if ($page) {
           </div>
         {:else}
           <button
-            class="cursor-pointer rounded border border-[#4285f4] bg-[#4285f4] px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:border-[#3367d6] hover:bg-[#3367d6] hover:shadow"
+            class="cursor-pointer rounded border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:opacity-90"
             on:click={handleLogin}
             title="Login with GitHub"
           >
@@ -286,7 +288,7 @@ $: if ($page) {
   <!-- Mobile menu -->
   {#if mobileMenuOpen}
     <div
-      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-md lg:hidden"
+      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-sm lg:hidden"
     >
       <nav class="flex flex-col gap-4">
         <ul class="m-0 flex list-none flex-col gap-4 p-0">
@@ -367,14 +369,14 @@ $: if ($page) {
               </a>
             </div>
             <button
-              class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,black_5%,transparent)]"
+              class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:border-[var(--color-accent)] hover:bg-[var(--color-tertiary)]"
               on:click={handleLogout}
             >
               Logout
             </button>
           {:else}
             <button
-              class="cursor-pointer rounded border border-[#4285f4] bg-[#4285f4] px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:border-[#3367d6] hover:bg-[#3367d6] hover:shadow"
+              class="cursor-pointer rounded border border-[var(--color-accent)] bg-[var(--color-accent)] px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:opacity-90"
               on:click={handleLogin}
               title="Login with GitHub"
             >
@@ -410,9 +412,10 @@ header {
   right: 0;
 }
 
-/* Ensure username is always purple */
+/* Ensure username is always blue */
 a[href*='github.com'] {
   color: var(--color-username) !important;
+  position: relative;
 }
 
 a[href*='github.com']:hover {

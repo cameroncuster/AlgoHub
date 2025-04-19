@@ -127,14 +127,16 @@ function getDifficultyTooltip(problem: Problem): string {
 </script>
 
 <div class="mt-4 w-full">
-  <div class="table-wrapper rounded-lg bg-[var(--color-secondary)] shadow-sm">
+  <div
+    class="table-wrapper overflow-hidden rounded border border-[var(--color-border)] bg-[var(--color-secondary)] shadow-sm"
+  >
     <table
       class="w-full min-w-[900px] table-fixed border-collapse overflow-hidden bg-[var(--color-secondary)]"
     >
       <thead>
         <tr>
           <th
-            class="sticky top-0 z-10 w-[5%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            class="sticky top-0 z-10 w-[5%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_20%,transparent)]"
             on:click={handleSolvedFilter}
             title="Filter by solved status"
           >
@@ -194,7 +196,7 @@ function getDifficultyTooltip(problem: Problem): string {
             </div>
           </th>
           <th
-            class="sticky top-0 z-10 w-[5%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            class="sticky top-0 z-10 w-[5%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_20%,transparent)]"
             on:click={handleSourceFilter}
             title="Filter by source"
           >
@@ -240,7 +242,7 @@ function getDifficultyTooltip(problem: Problem): string {
             >Problem</th
           >
           <th
-            class="sticky top-0 z-10 w-[10%] cursor-pointer bg-[var(--color-tertiary)] p-3 py-4 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            class="sticky top-0 z-10 w-[10%] cursor-pointer bg-[var(--color-tertiary)] p-3 py-4 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_20%,transparent)]"
             on:click={handleDifficultySort}
             title="Click to sort by difficulty"
           >
@@ -285,16 +287,16 @@ function getDifficultyTooltip(problem: Problem): string {
             class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0
             ${problem.id && userSolvedProblems.has(problem.id)
               ? 'border-l-4 border-l-[rgb(34_197_94)] bg-[var(--color-solved-row)]'
-              : 'hover:bg-black/5'}"
+              : 'hover:bg-[var(--color-tertiary)]'}"
           >
             <td class="p-3 text-center">
               {#if problem.id}
                 {@const isSolved = userSolvedProblems.has(problem.id)}
                 <button
-                  class={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full shadow-sm transition-all duration-300
+                  class={`flex h-7 w-7 cursor-pointer items-center justify-center rounded shadow-sm transition-all duration-300
                     ${isSolved
-                      ? 'solved-button bg-[rgb(34_197_94)] text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]'
-                      : 'border border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(34_197_94)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)] hover:shadow-[0_0_5px_rgba(34,197,94,0.2)]'
+                      ? 'solved-button bg-[rgb(34_197_94)] text-white shadow-[0_0_4px_rgba(34,197,94,0.2)]'
+                      : 'border border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(34_197_94)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_15%,transparent)] hover:text-[rgb(34_197_94)]'
                     } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
                   on:click={() => isAuthenticated && onToggleSolved(problem.id!, !isSolved)}
                   title={!isAuthenticated
@@ -344,14 +346,14 @@ function getDifficultyTooltip(problem: Problem): string {
             </td>
             <td class="p-3 text-center">
               <span
-                class="group relative inline-block rounded px-2 py-1 font-bold
-                  text-white
+                class="group relative inline-block rounded px-2 py-1 font-medium
+                  text-white shadow-sm
                    {problem.source === 'codeforces' ? 'cursor-default' : 'cursor-help'}"
                 style="background-color: var(--color-{getRatingColor(problem.difficulty)})"
               >
                 {problem.difficulty}
                 <span
-                  class="invisible absolute bottom-full left-1/2 z-50 -translate-x-1/2 transform rounded-md border border-[var(--color-border)] bg-[var(--color-secondary)] text-left text-xs leading-relaxed font-normal whitespace-pre-line text-[var(--color-text)] opacity-0 shadow-md transition-opacity duration-300 group-hover:visible group-hover:opacity-100 {problem.source === 'codeforces'
+                  class="invisible absolute bottom-full left-1/2 z-50 -translate-x-1/2 transform rounded border border-[var(--color-border)] bg-[var(--color-secondary)] text-left text-xs leading-relaxed font-normal whitespace-pre-line text-[var(--color-text)] opacity-0 shadow-md transition-opacity duration-300 group-hover:visible group-hover:opacity-100 {problem.source === 'codeforces'
                     ? 'w-auto max-w-fit min-w-0 p-1.5 px-3 text-center whitespace-nowrap'
                     : 'w-[280px] p-2.5'} mb-0.3"
                 >
@@ -391,8 +393,8 @@ function getDifficultyTooltip(problem: Problem): string {
                   <button
                     class={`flex cursor-pointer items-center gap-1 rounded border px-2 py-1 transition-all duration-200
                       ${hasLiked
-                        ? 'border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] text-[rgb(34_197_94)]'
-                        : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)]'
+                        ? 'border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] bg-[color-mix(in_oklab,rgb(34_197_94)_15%,transparent)] text-[rgb(34_197_94)]'
+                        : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_15%,transparent)] hover:text-[rgb(34_197_94)]'
                       } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
                     on:click={() => isAuthenticated && onLike(problem.id!, true)}
                     title={!isAuthenticated
@@ -425,8 +427,8 @@ function getDifficultyTooltip(problem: Problem): string {
                   <button
                     class={`flex cursor-pointer items-center gap-1 rounded border px-2 py-1 transition-all duration-200
                       ${hasDisliked
-                        ? 'border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] text-[rgb(239_68_68)]'
-                        : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] hover:text-[rgb(239_68_68)]'
+                        ? 'border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] bg-[color-mix(in_oklab,rgb(239_68_68)_15%,transparent)] text-[rgb(239_68_68)]'
+                        : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(239_68_68)_15%,transparent)] hover:text-[rgb(239_68_68)]'
                       } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
                     on:click={() => isAuthenticated && onLike(problem.id!, false)}
                     title={!isAuthenticated
@@ -522,7 +524,7 @@ th {
 
 /* Select styling is now handled in the RecommendersFilter component */
 
-/* Ensure username is always purple */
+/* Ensure username is always blue */
 a[href*='github.com'] {
   color: var(--color-username) !important;
 }
@@ -533,10 +535,10 @@ a[href*='github.com']:hover {
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 5px rgba(34, 197, 94, 0.4);
+    box-shadow: 0 0 4px rgba(34, 197, 94, 0.2);
   }
   100% {
-    box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
   }
 }
 </style>
