@@ -5,10 +5,7 @@ import { user } from '$lib/services/auth';
 import { fetchUserPreferences, updateUserPreferences } from '$lib/services/user';
 import type { UserPreferences } from '$lib/services/user';
 import type { Unsubscriber } from 'svelte/store';
-
-// Get the session data from the server
-export let data;
-// We don't directly use data in the template, but it's required for the server-side check
+import { supabase } from '$lib/services/database';
 
 let preferences: UserPreferences = {
   hideFromLeaderboard: false
@@ -26,11 +23,30 @@ async function loadPreferences(): Promise<void> {
   error = null;
 
   try {
+    console.log('loadPreferences: Fetching user preferences');
     const userPrefs = await fetchUserPreferences();
     if (userPrefs) {
+      console.log('loadPreferences: User preferences loaded', userPrefs);
       preferences = userPrefs;
+    } else {
+      console.log('loadPreferences: No preferences returned, using defaults');
+      // If no preferences were returned, try to create them
+      const result = await updateUserPreferences({
+        hideFromLeaderboard: false
+      });
+
+      if (result) {
+        console.log('loadPreferences: Default preferences created');
+        // Set the default preferences in the UI
+        preferences = {
+          hideFromLeaderboard: false
+        };
+      } else {
+        console.log('loadPreferences: Failed to create default preferences');
+      }
     }
   } catch (err) {
+    console.error('loadPreferences: Error loading preferences', err);
     error = 'Failed to load preferences';
   } finally {
     loading = false;
@@ -44,16 +60,20 @@ async function savePreferences(): Promise<void> {
   success = null;
 
   try {
+    console.log('savePreferences: Saving preferences', preferences);
     const result = await updateUserPreferences(preferences);
     if (result) {
+      console.log('savePreferences: Preferences saved successfully');
       success = 'Saved';
       setTimeout(() => {
         success = null;
       }, 2000);
     } else {
+      console.error('savePreferences: Failed to save preferences');
       error = 'Failed to save';
     }
   } catch (err) {
+    console.error('savePreferences: Error saving preferences', err);
     error = 'Failed to save';
   } finally {
     saving = false;
@@ -68,15 +88,99 @@ function toggleHideFromLeaderboard(): void {
 
 // Initialize auth state and load preferences
 onMount(() => {
-  // Load preferences immediately since we know the user is authenticated
-  // (the server-side load function already checked this)
-  loadPreferences();
+  // Create a flag to track if we've already checked auth
+  let authChecked = false;
+  let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  // Set up a subscription to handle logout events
-  userUnsubscribe = user.subscribe((value) => {
-    if (value === null) {
+  // First, directly check the session
+  const checkSession = async () => {
+    try {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        // No session, redirect to home
+        goto('/');
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('Error checking session:', err);
+      return false;
+    }
+  };
+
+  // Function to load preferences with a delay
+  const loadPreferencesWithDelay = () => {
+    // Clear any existing timeout
+    if (loadingTimeout) {
+      clearTimeout(loadingTimeout);
+    }
+
+    // Set a timeout to ensure user state is fully initialized
+    loadingTimeout = setTimeout(async () => {
+      console.log('Loading preferences after delay');
+
+      // Try to directly check the toggle state from the database
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user) {
+          const userId = data.session.user.id;
+          console.log('Directly checking preferences for user', userId);
+
+          const { data: prefData, error } = await supabase
+            .from('user_preferences')
+            .select('hide_from_leaderboard')
+            .eq('user_id', userId)
+            .single();
+
+          if (prefData && !error) {
+            console.log('Direct preference check result:', prefData);
+            preferences = {
+              hideFromLeaderboard: prefData.hide_from_leaderboard
+            };
+            loading = false;
+            return;
+          } else {
+            console.log('No direct preferences found, falling back to normal load');
+          }
+        }
+      } catch (err) {
+        console.error('Error in direct preference check:', err);
+      }
+
+      // Fall back to normal loading if direct check fails
+      loadPreferences();
+    }, 500); // 500ms delay
+  };
+
+  // Check session and load preferences if authenticated
+  checkSession().then((isAuthenticated) => {
+    if (isAuthenticated) {
+      authChecked = true;
+      loadPreferencesWithDelay();
+    }
+  });
+
+  // Also set up a subscription to handle auth state changes
+  userUnsubscribe = user.subscribe(async (value) => {
+    console.log('User state changed:', value ? 'logged in' : 'logged out');
+
+    // If we haven't checked auth yet, do it now
+    if (!authChecked && value === null) {
+      // Double-check with the API directly
+      const isAuthenticated = await checkSession();
+      if (!isAuthenticated) {
+        goto('/');
+        return;
+      }
+    } else if (value === null) {
       // User logged out, redirect to home
       goto('/');
+      return;
+    } else if (!authChecked || value) {
+      // User is authenticated and we haven't loaded preferences yet
+      // OR user state just changed to logged in
+      authChecked = true;
+      loadPreferencesWithDelay();
     }
   });
 
@@ -84,6 +188,9 @@ onMount(() => {
   return () => {
     if (userUnsubscribe) {
       userUnsubscribe();
+    }
+    if (loadingTimeout) {
+      clearTimeout(loadingTimeout);
     }
   };
 });
