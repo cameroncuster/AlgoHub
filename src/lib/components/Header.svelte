@@ -129,16 +129,18 @@ $: if ($page) {
       <a
         href="/"
         aria-label="Home"
-        class="flex items-center gap-2 text-xl font-bold text-[var(--color-heading)] no-underline"
+        class="flex items-center gap-2 pr-2 text-xl font-bold text-[var(--color-heading)] no-underline lg:pr-4"
       >
         <img src="/favicon.png" alt="gitgud Logo" class="h-12 w-12 object-contain" />
-        <span>gitgud.cc</span>
+        <span class="flex">
+          <span>gitgud</span><span class="hidden sm:inline">.cc</span>
+        </span>
       </a>
     </div>
 
     <!-- Mobile menu button -->
     <button
-      class="flex items-center rounded-md border border-[var(--color-border)] px-2 py-1 text-[var(--color-text)] md:hidden"
+      class="flex items-center rounded-md border border-[var(--color-border)] px-2 py-1 text-[var(--color-text)] lg:hidden"
       aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
       on:click={toggleMobileMenu}
     >
@@ -162,8 +164,8 @@ $: if ($page) {
     </button>
 
     <!-- Desktop navigation -->
-    <nav class="hidden items-center gap-6 md:flex md:gap-4">
-      <ul class="m-0 flex list-none gap-6 p-0 md:gap-4">
+    <nav class="hidden items-center gap-6 lg:flex lg:gap-4">
+      <ul class="m-0 flex list-none gap-2 p-0 lg:gap-3 xl:gap-4">
         <li
           class="relative {$page.url.pathname === '/'
             ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
@@ -171,7 +173,7 @@ $: if ($page) {
         >
           <a
             href="/"
-            class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >Problems</a
           >
         </li>
@@ -182,7 +184,7 @@ $: if ($page) {
         >
           <a
             href="/contests"
-            class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >Contests</a
           >
         </li>
@@ -193,7 +195,7 @@ $: if ($page) {
         >
           <a
             href="/leaderboard"
-            class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >Leaderboard</a
           >
         </li>
@@ -204,7 +206,7 @@ $: if ($page) {
         >
           <a
             href="/about"
-            class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >About</a
           >
         </li>
@@ -216,7 +218,7 @@ $: if ($page) {
           >
             <a
               href="/submit"
-              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+              class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
               >Submit</a
             >
           </li>
@@ -229,20 +231,45 @@ $: if ($page) {
         style="will-change: opacity;"
       >
         {#if $user}
-          <a
-            href={githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-sm font-medium text-[var(--color-username)] transition-colors duration-200 hover:text-[color-mix(in_oklab,var(--color-username)_80%,white)]"
-          >
-            @{username}
-          </a>
-          <button
-            class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,black_5%,transparent)]"
-            on:click={handleLogout}
-          >
-            Logout
-          </button>
+          <div class="flex items-center gap-3">
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm font-medium text-[var(--color-username)] transition-colors duration-200 hover:text-[color-mix(in_oklab,var(--color-username)_80%,white)]"
+            >
+              @{username}
+            </a>
+            <a
+              href="/settings"
+              class="flex items-center justify-center rounded-full p-1.5 text-[var(--color-text)] transition-colors hover:bg-[var(--color-tertiary)] hover:text-[var(--color-accent)]"
+              title="Settings"
+              aria-label="Settings"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-5 w-5"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+                ></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </a>
+            <button
+              class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,black_5%,transparent)]"
+              on:click={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
         {:else}
           <button
             class="cursor-pointer rounded border border-[#4285f4] bg-[#4285f4] px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:border-[#3367d6] hover:bg-[#3367d6] hover:shadow"
@@ -259,7 +286,7 @@ $: if ($page) {
   <!-- Mobile menu -->
   {#if mobileMenuOpen}
     <div
-      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-md md:hidden"
+      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-md lg:hidden"
     >
       <nav class="flex flex-col gap-4">
         <ul class="m-0 flex list-none flex-col gap-4 p-0">
@@ -306,14 +333,39 @@ $: if ($page) {
           style="will-change: opacity;"
         >
           {#if $user}
-            <a
-              href={githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-sm font-medium text-[var(--color-username)] transition-colors duration-200 hover:text-[color-mix(in_oklab,var(--color-username)_80%,white)]"
-            >
-              @{username}
-            </a>
+            <div class="flex items-center gap-3">
+              <a
+                href={githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-sm font-medium text-[var(--color-username)] transition-colors duration-200 hover:text-[color-mix(in_oklab,var(--color-username)_80%,white)]"
+              >
+                @{username}
+              </a>
+              <a
+                href="/settings"
+                class="flex items-center justify-center rounded-full p-1.5 text-[var(--color-text)] transition-colors hover:bg-[var(--color-tertiary)] hover:text-[var(--color-accent)]"
+                title="Settings"
+                aria-label="Settings"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="h-5 w-5"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+                  ></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </a>
+            </div>
             <button
               class="cursor-pointer rounded border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm font-semibold text-[var(--color-text)] transition-all duration-200 hover:bg-[color-mix(in_oklab,black_5%,transparent)]"
               on:click={handleLogout}
@@ -348,7 +400,7 @@ $: if ($page) {
   }
 }
 
-div.md\:hidden {
+div.lg\:hidden {
   animation: slideDown 0.2s ease-out;
 }
 

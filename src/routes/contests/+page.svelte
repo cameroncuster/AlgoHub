@@ -310,7 +310,7 @@ onMount(() => {
 </script>
 
 <svelte:head>
-  <title>gitgud | Contests</title>
+  <title>Contests</title>
   <meta name="description" content="Browse and track programming contests from various platforms" />
 </svelte:head>
 

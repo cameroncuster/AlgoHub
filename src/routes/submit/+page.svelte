@@ -51,7 +51,7 @@ onMount(() => {
 </script>
 
 <svelte:head>
-  <title>gitgud | Submit</title>
+  <title>Submit</title>
 </svelte:head>
 
 <div class="flex w-full items-center justify-center p-4 sm:p-6">
