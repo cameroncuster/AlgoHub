@@ -47,6 +47,7 @@ FROM user_stats
 ORDER BY user_stats.problems_solved DESC,
   user_stats.earliest_solves_sum ASC;
 $$ LANGUAGE SQL SECURITY DEFINER;
+
 -- Grant permissions
 GRANT EXECUTE ON FUNCTION get_leaderboard() TO authenticated,
   anon;

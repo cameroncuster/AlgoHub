@@ -51,7 +51,7 @@ onMount(() => {
 </script>
 
 <svelte:head>
-  <title>AlgoHub | Submit</title>
+  <title>gitgud | Submit</title>
 </svelte:head>
 
 <div class="flex w-full items-center justify-center p-4 sm:p-6">
