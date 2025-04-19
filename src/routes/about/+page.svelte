@@ -9,7 +9,7 @@
 
 <div class="mx-auto max-w-3xl px-4 py-8">
   <section class="mb-10">
-    <h2 class="mb-4 text-2xl text-[var(--color-accent)]">gitgud</h2>
+    <h2 class="mb-4 text-2xl text-[var(--color-accent)]">gitgud.cc</h2>
     <p class="mb-4 leading-relaxed">
       gitgud is a collection of hand-picked problems. If you are new to competitive programming you
       can learn the fundamentals at some of these sites:
