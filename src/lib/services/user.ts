@@ -10,6 +10,7 @@ import { get } from 'svelte/store';
  */
 export type UserPreferences = {
   hideFromLeaderboard: boolean;
+  theme: string;
 };
 
 /**
@@ -19,6 +20,7 @@ export type UserPreferencesRecord = {
   id: string;
   user_id: string;
   hide_from_leaderboard: boolean;
+  theme: string;
   created_at: string;
   updated_at: string;
 };
@@ -65,13 +67,15 @@ export async function fetchUserPreferences(): Promise<UserPreferences | null> {
         console.log('fetchUserPreferences: No preferences found, creating default');
         // Create default preferences
         const result = await updateUserPreferences({
-          hideFromLeaderboard: false
+          hideFromLeaderboard: false,
+          theme: 'light'
         });
 
         if (result) {
           console.log('fetchUserPreferences: Default preferences created');
           return {
-            hideFromLeaderboard: false
+            hideFromLeaderboard: false,
+            theme: 'light'
           };
         }
       }
@@ -86,7 +90,8 @@ export async function fetchUserPreferences(): Promise<UserPreferences | null> {
     console.log('fetchUserPreferences: Preferences found', data);
     const record = data as UserPreferencesRecord;
     return {
-      hideFromLeaderboard: record.hide_from_leaderboard
+      hideFromLeaderboard: record.hide_from_leaderboard,
+      theme: record.theme || 'light' // Provide default if not present
     };
   } catch (err) {
     console.error('fetchUserPreferences: Exception', err);
@@ -144,6 +149,7 @@ export async function updateUserPreferences(preferences: UserPreferences): Promi
         .from('user_preferences')
         .update({
           hide_from_leaderboard: preferences.hideFromLeaderboard,
+          theme: preferences.theme,
           updated_at: new Date().toISOString()
         })
         .eq('user_id', currentUser.id);
@@ -153,6 +159,7 @@ export async function updateUserPreferences(preferences: UserPreferences): Promi
       result = await supabase.from('user_preferences').insert({
         user_id: currentUser.id,
         hide_from_leaderboard: preferences.hideFromLeaderboard,
+        theme: preferences.theme,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       });
@@ -171,6 +178,7 @@ export async function updateUserPreferences(preferences: UserPreferences): Promi
           .from('user_preferences')
           .update({
             hide_from_leaderboard: preferences.hideFromLeaderboard,
+            theme: preferences.theme,
             updated_at: new Date().toISOString()
           })
           .eq('user_id', currentUser.id);

@@ -3,7 +3,9 @@ import Footer from '$lib/components/Footer.svelte';
 import Header from '$lib/components/Header.svelte';
 import '../app.css';
 import { onMount } from 'svelte';
-import { initAuth } from '$lib/services/auth';
+import { initAuth, user } from '$lib/services/auth';
+import { loadThemePreference, applyTheme } from '$lib/services/theme';
+import { browser } from '$app/environment';
 
 let authSubscription: { subscription: { unsubscribe: () => void } } | null = null;
 
@@ -11,6 +13,26 @@ onMount(() => {
   // Initialize authentication
   const initializeAuth = async () => {
     authSubscription = await initAuth();
+
+    // Apply theme immediately to prevent flashing
+    if (browser) {
+      // Try to get theme from localStorage first for immediate application
+      // This prevents flashing while we wait for the database
+      const storedTheme = localStorage.getItem('gitgud-theme');
+      if (storedTheme) {
+        applyTheme(storedTheme);
+      } else {
+        // Default to light theme if nothing in localStorage
+        applyTheme('light');
+      }
+
+      // Load user's theme preference from database once authenticated
+      user.subscribe(async (currentUser) => {
+        if (currentUser) {
+          await loadThemePreference();
+        }
+      });
+    }
   };
 
   initializeAuth();

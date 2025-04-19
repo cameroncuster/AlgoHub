@@ -71,7 +71,7 @@ function formatNumber(num: number): string {
                   <img
                     src={entry.avatarUrl}
                     alt={entry.username}
-                    class="h-8 w-8 rounded border-2 border-[var(--color-border)] sm:h-10 sm:w-10"
+                    class="h-8 w-8 rounded sm:h-10 sm:w-10"
                   />
                 {:else}
                   <div

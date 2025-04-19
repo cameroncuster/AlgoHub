@@ -333,8 +333,8 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -374,7 +374,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             </td>
             <td class="p-3 text-center">
               {#if contest.difficulty !== undefined}
-                <span class={`text-lg font-bold ${getDifficultyColorClass(contest.difficulty)}`}>
+                <span class={`text-2xl font-bold ${getDifficultyColorClass(contest.difficulty)}`}>
                   {getDifficultyStars(contest.difficulty)}
                 </span>
               {:else}
@@ -414,8 +414,8 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
+                      width="18"
+                      height="18"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -448,8 +448,8 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
+                      width="18"
+                      height="18"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"

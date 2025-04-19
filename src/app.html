@@ -7,39 +7,48 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
-    <!-- Theme initialization script to prevent flashing -->
+    <!-- Preload styles to prevent theme flashing -->
+    <style>
+      :root {
+        /* Default light theme colors to prevent flashing */
+        --color-primary: oklch(0.9 0.03 240);
+        --color-secondary: oklch(0.95 0.02 240);
+        --color-tertiary: oklch(0.85 0.04 240);
+        --color-accent: oklch(0.7 0.2 350);
+        --color-heading: oklch(0.2 0 0 / 0.9);
+        --color-text: oklch(0.2 0 0 / 0.8);
+        --color-text-muted: oklch(0.2 0 0 / 0.5);
+        --color-background: oklch(0.9 0.03 240 / 0.7);
+        --color-border: oklch(0.75 0.05 240);
+      }
+
+      body {
+        background-color: var(--color-primary);
+        color: var(--color-text);
+        font-family: 'Courier New', Courier, monospace;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+    </style>
+
+    <!-- Script to apply theme from localStorage immediately -->
     <script>
       (function() {
         try {
-          const savedTheme = localStorage.getItem('gitgud-theme');
-          if (savedTheme) {
-            // Apply theme colors from theme files
-            let themeColors = '';
-
-            // We can't import the theme files directly, so we'll need to hardcode the dark theme colors
-            // This is just for the initial load to prevent flashing
-            if (savedTheme === 'retro-blue-dark') {
-              themeColors = `
-                --color-primary: oklch(0.2 0.05 240);
-                --color-secondary: oklch(0.25 0.04 240);
-                --color-tertiary: oklch(0.15 0.06 240);
-                --color-heading: oklch(0.9 0 0 / 0.9);
-                --color-text: oklch(0.9 0 0 / 0.8);
-                --color-text-muted: oklch(0.9 0 0 / 0.5);
-                --color-background: oklch(0.2 0.05 240 / 0.7);
-                --color-border: oklch(0.3 0.08 240);
-                --color-link-nav: oklch(0.9 0 0 / 0.9);
-              `;
-
-              // Create a style element and add it to the head
-              const style = document.createElement('style');
-              style.id = 'theme-init';
-              style.textContent = `:root {${themeColors}}`;
-              document.head.appendChild(style);
-            }
+          const storedTheme = localStorage.getItem('gitgud-theme');
+          if (storedTheme === 'dark') {
+            // Apply dark theme immediately
+            document.documentElement.style.setProperty('--color-primary', 'oklch(0.2 0.05 240)');
+            document.documentElement.style.setProperty('--color-secondary', 'oklch(0.25 0.04 240)');
+            document.documentElement.style.setProperty('--color-tertiary', 'oklch(0.15 0.06 240)');
+            document.documentElement.style.setProperty('--color-heading', 'oklch(0.9 0 0 / 0.9)');
+            document.documentElement.style.setProperty('--color-text', 'oklch(0.9 0 0 / 0.8)');
+            document.documentElement.style.setProperty('--color-text-muted', 'oklch(0.9 0 0 / 0.5)');
+            document.documentElement.style.setProperty('--color-background', 'oklch(0.2 0.05 240 / 0.7)');
+            document.documentElement.style.setProperty('--color-border', 'oklch(0.3 0.08 240)');
+            document.documentElement.style.setProperty('--color-link-nav', 'oklch(0.9 0 0 / 0.9)');
           }
         } catch (e) {
-          console.error('Error initializing theme:', e);
+          console.error('Error applying theme:', e);
         }
       })();
     </script>
