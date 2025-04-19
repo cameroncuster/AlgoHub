@@ -1,6 +1,6 @@
-# AlgoHub - Programming Problems Hub
+# gitgud - Programming Problems Hub
 
-AlgoHub is a modern web application that provides a curated collection of programming problems from various competitive programming platforms. It helps users improve their coding skills, prepare for technical interviews, and master algorithmic thinking.
+gitgud is a modern web application that provides a curated collection of programming problems from various competitive programming platforms. It helps users improve their coding skills, prepare for technical interviews, and master algorithmic thinking.
 
 ## Features
 
@@ -28,8 +28,8 @@ AlgoHub is a modern web application that provides a curated collection of progra
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/cameroncuster/AlgoHub.git
-   cd AlgoHub
+   git clone https://github.com/cameroncuster/gitgud.git
+   cd gitgud
    ```
 
 2. Install dependencies:

@@ -8,11 +8,11 @@
   <div class="mx-auto max-w-7xl px-6 sm:px-3 md:px-4">
     <div class="flex items-center justify-between">
       <div class="text-sm text-[var(--color-text)]">
-        © {new Date().getFullYear()} AlgoHub
+        © {new Date().getFullYear()} gitgud
       </div>
       <div class="flex gap-6">
         <a
-          href="https://github.com/cameroncuster/AlgoHub"
+          href="https://github.com/cameroncuster/gitgud"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="GitHub Repository"

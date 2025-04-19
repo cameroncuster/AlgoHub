@@ -275,7 +275,7 @@ async function processUrls() {
 </script>
 
 <svelte:head>
-  <title>AlgoHub | Submit Codeforces</title>
+  <title>gitgud | Submit Codeforces</title>
 </svelte:head>
 
 <div class="mx-auto box-border w-full max-w-4xl px-4 py-6">

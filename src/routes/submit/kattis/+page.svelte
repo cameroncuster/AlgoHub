@@ -9,7 +9,7 @@ import {
 </script>
 
 <svelte:head>
-  <title>AlgoHub | Submit Kattis</title>
+  <title>gitgud | Submit Kattis</title>
 </svelte:head>
 
 <ProblemSubmitForm

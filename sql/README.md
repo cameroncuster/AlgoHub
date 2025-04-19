@@ -1,6 +1,6 @@
-# AlgoHub Database Schema
+# gitgud Database Schema
 
-This directory contains the SQL files that define the database schema for AlgoHub.
+This directory contains the SQL files that define the database schema for gitgud.
 
 ## Directory Structure
 

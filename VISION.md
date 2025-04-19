@@ -1,8 +1,8 @@
-# AlgoHub Vision
+# gitgud Vision
 
 ## Core Concept
 
-AlgoHub is a social platform for competitive programming problems, designed to connect problem solvers worldwide through shared content and recommendations.
+gitgud is a social platform for competitive programming problems, designed to connect problem solvers worldwide through shared content and recommendations.
 
 ## Governance Structure
 
