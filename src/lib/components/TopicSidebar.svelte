@@ -99,7 +99,7 @@ onMount(() => {
 
 <!-- Desktop sidebar (always visible) -->
 <div
-  class="absolute top-[60px] left-0 hidden h-auto w-[13rem] border-r border-[var(--color-border)] bg-[var(--color-secondary)] md:block"
+  class="absolute top-[60px] left-0 hidden h-auto w-[13rem] border-r border-[var(--color-border)] bg-[var(--color-primary)] md:block"
 >
   <div class="max-h-[calc(100vh-140px)] overflow-y-auto">
     <div class="w-full space-y-1 p-3">

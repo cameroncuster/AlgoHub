@@ -238,9 +238,9 @@ function getDifficultyTooltip(problem: Problem): string {
               {/if}
             </div>
           </th>
-          <th class="sticky top-0 z-10 w-[25%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
-            >Problem</th
-          >
+          <th class="sticky top-0 z-10 w-[25%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+            <span class="pl-1">Problem</span>
+          </th>
           <th
             class="sticky top-0 z-10 w-[10%] cursor-pointer bg-[var(--color-tertiary)] p-3 py-4 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_20%,transparent)]"
             on:click={handleDifficultySort}
@@ -262,9 +262,9 @@ function getDifficultyTooltip(problem: Problem): string {
               <span class="font-bold">Difficulty</span>
             </div>
           </th>
-          <th class="sticky top-0 z-10 w-[10%] bg-[var(--color-tertiary)] p-3 text-left font-bold"
-            >Topic</th
-          >
+          <th class="sticky top-0 z-10 w-[10%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+            <span class="pl-1">Topic</span>
+          </th>
           <th class="sticky top-0 z-10 w-[22%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
             <div class="flex items-center gap-2">
               <RecommendersFilter
@@ -293,10 +293,10 @@ function getDifficultyTooltip(problem: Problem): string {
               {#if problem.id}
                 {@const isSolved = userSolvedProblems.has(problem.id)}
                 <button
-                  class={`flex h-7 w-7 cursor-pointer items-center justify-center rounded shadow-sm transition-all duration-300
+                  class={`flex h-7 w-7 cursor-pointer items-center justify-center rounded shadow-sm transition-colors duration-200
                     ${isSolved
-                      ? 'solved-button bg-[rgb(34_197_94)] text-white shadow-[0_0_4px_rgba(34,197,94,0.2)]'
-                      : 'border border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(34_197_94)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_15%,transparent)] hover:text-[rgb(34_197_94)]'
+                      ? 'bg-[rgb(50_150_100)] text-white'
+                      : 'border border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(50_150_100)] hover:bg-[color-mix(in_oklab,rgb(50_150_100)_15%,var(--color-tertiary))] hover:text-[rgb(50_150_100)]'
                     } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
                   on:click={() => isAuthenticated && onToggleSolved(problem.id!, !isSolved)}
                   title={!isAuthenticated
@@ -338,7 +338,7 @@ function getDifficultyTooltip(problem: Problem): string {
                 href={problem.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-[var(--color-text)] hover:text-[var(--color-accent)] hover:underline"
+                class="inline-block pl-1 text-[var(--color-text)] hover:text-[var(--color-accent)] hover:underline"
                 title={problem.name}
               >
                 {problem.name}
@@ -364,12 +364,12 @@ function getDifficultyTooltip(problem: Problem): string {
             <td class="p-3">
               {#if problem.type}
                 <span
-                  class="inline-block rounded bg-[var(--color-tertiary)] px-2 py-1 text-sm text-[var(--color-text)]"
+                  class="ml-1 inline-block rounded bg-[var(--color-tertiary)] px-2 py-1 text-sm text-[var(--color-text)]"
                 >
                   {problem.type}
                 </span>
               {:else}
-                <span class="text-[var(--color-text-muted)]">-</span>
+                <span class="ml-1 text-[var(--color-text-muted)]">-</span>
               {/if}
             </td>
             <td class="truncate p-3">
@@ -504,17 +504,9 @@ tr {
   overflow: hidden;
 }
 
-/* Checkmark animation */
-.solved-button {
-  animation: pulse 1.5s infinite alternate;
-}
-
+/* Checkmark styling */
 .checkmark-icon {
-  transition: transform 0.3s ease;
-}
-
-.solved-button .checkmark-icon {
-  transform: scale(1.1);
+  transition: transform 0.2s ease;
 }
 
 /* Sortable header styles */
@@ -533,12 +525,5 @@ a[href*='github.com']:hover {
   color: color-mix(in oklab, var(--color-username) 80%, white) !important;
 }
 
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 4px rgba(34, 197, 94, 0.2);
-  }
-  100% {
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
-  }
-}
+/* No animation for solved buttons */
 </style>

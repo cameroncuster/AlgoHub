@@ -124,7 +124,7 @@ $: if ($page) {
 </script>
 
 <header
-  class="sticky top-0 z-50 w-full border-b border-[var(--color-border)] bg-[var(--color-secondary)] py-3 shadow-sm"
+  class="sticky top-0 z-50 w-full border-b border-[var(--color-border)] bg-[var(--color-primary)] py-3 shadow-md"
 >
   <div class="mx-auto flex max-w-[1200px] items-center justify-between px-3 sm:px-4 md:px-5">
     <div class="flex items-center">
@@ -288,7 +288,7 @@ $: if ($page) {
   <!-- Mobile menu -->
   {#if mobileMenuOpen}
     <div
-      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-sm lg:hidden"
+      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-primary)] px-4 py-4 shadow-md lg:hidden"
     >
       <nav class="flex flex-col gap-4">
         <ul class="m-0 flex list-none flex-col gap-4 p-0">

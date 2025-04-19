@@ -14,27 +14,27 @@
       'Open Sans', 'Helvetica Neue', sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Mono', monospace;
 
-    /* Colors - Clean White Theme with Sleek Accents */
+    /* Colors - Midnight Ocean Theme */
     --color-white: oklch(1 0 0);
-    --color-black: oklch(0.15 0 0);
-    --color-primary: oklch(0.99 0.005 250); /* Pure white background */
-    --color-secondary: oklch(1 0 0); /* White for cards */
-    --color-tertiary: oklch(0.97 0.01 250); /* Very light gray for hover states */
-    --color-accent: oklch(0.5 0.2 250); /* Blue accent */
-    --color-heading: oklch(0.15 0 0 / 0.95); /* Near black text for headings */
-    --color-text: oklch(0.25 0 0 / 0.9); /* Dark text for better readability */
-    --color-text-muted: oklch(0.45 0 0 / 0.6); /* Muted text */
-    --color-background: oklch(0.99 0.005 250); /* Pure white background */
-    --color-border: oklch(0.9 0.01 250); /* Very light gray border */
-    --color-link: oklch(0.5 0.2 250); /* Blue for links */
-    --color-link-subtle: oklch(0.6 0.1 250); /* Lighter blue for subtle links */
-    --color-link-nav: oklch(0.25 0 0 / 0.9); /* Dark text for nav links */
-    --color-username: oklch(0.5 0.2 250); /* Blue for usernames */
+    --color-black: oklch(0.1 0 0);
+    --color-primary: oklch(0.15 0.03 230); /* Deep ocean blue background */
+    --color-secondary: oklch(0.18 0.03 230); /* Slightly lighter background for cards */
+    --color-tertiary: oklch(0.12 0.03 230); /* Slightly darker for hover states */
+    --color-accent: oklch(0.6 0.1 200); /* Soft blue accent */
+    --color-heading: oklch(0.95 0 0 / 0.95); /* Near white text for headings */
+    --color-text: oklch(0.9 0 0 / 0.9); /* Light text for better readability */
+    --color-text-muted: oklch(0.7 0 0 / 0.7); /* Muted text */
+    --color-background: oklch(0.15 0.03 230); /* Deep ocean blue background */
+    --color-border: oklch(0.2 0.05 220); /* Subtle blue border */
+    --color-link: oklch(0.6 0.1 200); /* Soft blue for links */
+    --color-link-subtle: oklch(0.5 0.08 200); /* Slightly darker blue for subtle links */
+    --color-link-nav: oklch(0.9 0 0 / 0.9); /* Light text for nav links */
+    --color-username: oklch(0.6 0.1 200); /* Soft blue for usernames */
     --color-solved-row: color-mix(
       in oklab,
-      rgb(34 197 94) 12%,
-      transparent
-    ); /* Light green for solved rows */
+      rgb(50 150 100) 15%,
+      var(--color-tertiary)
+    ); /* Subtle green tint for solved rows */
 
     /* Codeforces rating colors */
     --color-legendary-grandmaster: oklch(0.65 0.27 29.23);
@@ -52,11 +52,11 @@
     --spacing: 0.25rem;
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.08);
-    --shadow-accent: 0 2px 8px rgba(0, 100, 255, 0.1);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --shadow-accent: 0 2px 8px rgba(100, 150, 200, 0.2);
 
     /* Border radius */
     --rounded-sm: 0.125rem;
@@ -118,13 +118,22 @@ h2 {
 pre {
   font-size: 1rem;
   font-family: var(--font-mono);
-  background-color: color-mix(in oklab, var(--color-tertiary) 80%, transparent);
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: color-mix(in oklab, var(--color-black) 70%, var(--color-primary));
+  border-radius: var(--rounded);
+  box-shadow: var(--shadow-md);
   padding: 1rem;
   overflow-x: auto;
   color: var(--color-heading);
   border: 1px solid var(--color-border);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background-color: color-mix(in oklab, var(--color-black) 60%, var(--color-primary));
+  padding: 0.1em 0.3em;
+  border-radius: var(--rounded-sm);
+  color: var(--color-heading);
 }
 
 input,
@@ -249,6 +258,7 @@ img {
 .table tr:hover {
   background-color: var(--color-tertiary);
   transition: background-color 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .badge {
