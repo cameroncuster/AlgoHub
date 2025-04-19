@@ -129,16 +129,18 @@ $: if ($page) {
       <a
         href="/"
         aria-label="Home"
-        class="flex items-center gap-2 text-xl font-bold text-[var(--color-heading)] no-underline"
+        class="flex items-center gap-2 pr-2 text-xl font-bold text-[var(--color-heading)] no-underline lg:pr-4"
       >
         <img src="/favicon.png" alt="gitgud Logo" class="h-12 w-12 object-contain" />
-        <span>gitgud.cc</span>
+        <span class="flex">
+          <span>gitgud</span><span class="hidden sm:inline">.cc</span>
+        </span>
       </a>
     </div>
 
     <!-- Mobile menu button -->
     <button
-      class="flex items-center rounded-md border border-[var(--color-border)] px-2 py-1 text-[var(--color-text)] md:hidden"
+      class="flex items-center rounded-md border border-[var(--color-border)] px-2 py-1 text-[var(--color-text)] lg:hidden"
       aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
       on:click={toggleMobileMenu}
     >
@@ -162,8 +164,8 @@ $: if ($page) {
     </button>
 
     <!-- Desktop navigation -->
-    <nav class="hidden items-center gap-6 md:flex md:gap-4">
-      <ul class="m-0 flex list-none gap-6 p-0 md:gap-4">
+    <nav class="hidden items-center gap-6 lg:flex lg:gap-4">
+      <ul class="m-0 flex list-none gap-2 p-0 lg:gap-3 xl:gap-4">
         <li
           class="relative {$page.url.pathname === '/'
             ? "after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-sm after:bg-[var(--color-accent)] after:content-['']"
@@ -171,7 +173,7 @@ $: if ($page) {
         >
           <a
             href="/"
-            class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >Problems</a
           >
         </li>
@@ -182,7 +184,7 @@ $: if ($page) {
         >
           <a
             href="/contests"
-            class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >Contests</a
           >
         </li>
@@ -193,7 +195,7 @@ $: if ($page) {
         >
           <a
             href="/leaderboard"
-            class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >Leaderboard</a
           >
         </li>
@@ -204,7 +206,7 @@ $: if ($page) {
         >
           <a
             href="/about"
-            class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+            class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
             >About</a
           >
         </li>
@@ -216,7 +218,7 @@ $: if ($page) {
           >
             <a
               href="/submit"
-              class="block py-2 text-base font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)]"
+              class="block py-2 text-sm font-semibold text-[var(--color-heading)] no-underline transition-colors duration-200 hover:text-[var(--color-accent)] lg:text-base"
               >Submit</a
             >
           </li>
@@ -284,7 +286,7 @@ $: if ($page) {
   <!-- Mobile menu -->
   {#if mobileMenuOpen}
     <div
-      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-md md:hidden"
+      class="mt-3 border-t border-[var(--color-border)] bg-[var(--color-secondary)] px-4 py-4 shadow-md lg:hidden"
     >
       <nav class="flex flex-col gap-4">
         <ul class="m-0 flex list-none flex-col gap-4 p-0">
@@ -398,7 +400,7 @@ $: if ($page) {
   }
 }
 
-div.md\:hidden {
+div.lg\:hidden {
   animation: slideDown 0.2s ease-out;
 }
 
