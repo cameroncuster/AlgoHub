@@ -6,9 +6,11 @@ import { fetchUserPreferences, updateUserPreferences } from '$lib/services/user'
 import type { UserPreferences } from '$lib/services/user';
 import type { Unsubscriber } from 'svelte/store';
 import { supabase } from '$lib/services/database';
+import { applyTheme } from '$lib/services/theme';
 
 let preferences: UserPreferences = {
-  hideFromLeaderboard: false
+  hideFromLeaderboard: false,
+  theme: 'light'
 };
 
 let loading: boolean = true;
@@ -28,18 +30,23 @@ async function loadPreferences(): Promise<void> {
     if (userPrefs) {
       console.log('loadPreferences: User preferences loaded', userPrefs);
       preferences = userPrefs;
+
+      // Apply theme immediately
+      applyTheme(preferences.theme);
     } else {
       console.log('loadPreferences: No preferences returned, using defaults');
       // If no preferences were returned, try to create them
       const result = await updateUserPreferences({
-        hideFromLeaderboard: false
+        hideFromLeaderboard: false,
+        theme: 'light'
       });
 
       if (result) {
         console.log('loadPreferences: Default preferences created');
         // Set the default preferences in the UI
         preferences = {
-          hideFromLeaderboard: false
+          hideFromLeaderboard: false,
+          theme: 'light'
         };
       } else {
         console.log('loadPreferences: Failed to create default preferences');
@@ -86,6 +93,25 @@ function toggleHideFromLeaderboard(): void {
   savePreferences();
 }
 
+// Toggle the theme setting
+function toggleTheme(): void {
+  // Toggle the theme
+  const newTheme = preferences.theme === 'light' ? 'dark' : 'light';
+  preferences.theme = newTheme;
+
+  // Apply theme immediately for better UX
+  applyTheme(newTheme);
+
+  // Save to localStorage for immediate persistence
+  localStorage.setItem('gitgud-theme', newTheme);
+
+  // Force a re-render by creating a new object
+  preferences = { ...preferences };
+
+  // Save to database
+  savePreferences();
+}
+
 // Initialize auth state and load preferences
 onMount(() => {
   // Create a flag to track if we've already checked auth
@@ -128,15 +154,19 @@ onMount(() => {
 
           const { data: prefData, error } = await supabase
             .from('user_preferences')
-            .select('hide_from_leaderboard')
+            .select('hide_from_leaderboard, theme')
             .eq('user_id', userId)
             .single();
 
           if (prefData && !error) {
             console.log('Direct preference check result:', prefData);
             preferences = {
-              hideFromLeaderboard: prefData.hide_from_leaderboard
+              hideFromLeaderboard: prefData.hide_from_leaderboard,
+              theme: prefData.theme || 'light'
             };
+
+            // Apply the theme immediately
+            applyTheme(preferences.theme);
             loading = false;
             return;
           } else {
@@ -203,10 +233,24 @@ onMount(() => {
 
 <div class="mx-auto w-full max-w-[1200px] px-4 py-6">
   {#if loading}
-    <div class="flex h-[200px] items-center justify-center">
-      <div
-        class="h-8 w-8 animate-spin rounded-full border-2 border-[var(--color-tertiary)] border-t-[var(--color-primary)]"
-      ></div>
+    <div class="flex h-[calc(100vh-4rem)] items-center justify-center py-2 text-center">
+      <div>
+        <svg
+          class="mx-auto h-10 w-10 animate-spin"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="var(--color-primary)"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        <p class="mt-2 text-[var(--color-text-muted)]">Loading settings...</p>
+      </div>
     </div>
   {:else}
     <div class="mb-4 flex h-6 justify-end">
@@ -218,8 +262,10 @@ onMount(() => {
       {/if}
     </div>
 
-    <div class="overflow-hidden rounded">
-      <div class="border-b border-[var(--color-border)] bg-[var(--color-tertiary)] p-4">
+    <div
+      class="overflow-hidden rounded-none border-2 border-[var(--color-border)] shadow-[2px_2px_0_rgba(0,0,0,0.1)]"
+    >
+      <div class="border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-4">
         <div class="flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -240,10 +286,13 @@ onMount(() => {
         </div>
       </div>
 
-      <div class="bg-[var(--color-tertiary)] p-4">
+      <div class="bg-[var(--color-secondary)] p-4">
         <div class="flex items-center justify-between">
           <div>
             <p class="font-medium text-[var(--color-text)]">Hide from leaderboard</p>
+            <p class="text-sm text-[var(--color-text-muted)]">
+              Your profile will not be visible on the public leaderboard
+            </p>
           </div>
 
           <div class="w-11 flex-shrink-0">
@@ -251,21 +300,78 @@ onMount(() => {
               type="button"
               role="switch"
               aria-checked={preferences.hideFromLeaderboard}
-              class="relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 focus:outline-none"
+              class="relative inline-flex h-6 w-11 cursor-pointer items-center rounded focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 focus:outline-none"
               on:click={toggleHideFromLeaderboard}
               disabled={saving}
             >
               <span class="sr-only">Hide from leaderboard</span>
               <span
-                class="absolute h-full w-full rounded-full transition-colors duration-200 {preferences.hideFromLeaderboard ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-text-muted)]'} {saving ? 'opacity-50' : ''}"
+                class="absolute h-full w-full rounded transition-colors duration-200 {preferences.hideFromLeaderboard ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-text-muted)]'} {saving ? 'opacity-50' : ''}"
               ></span>
               <span
-                class="absolute top-0.5 left-0.5 h-5 w-5 transform rounded-full bg-white transition-transform duration-200 {preferences.hideFromLeaderboard ? 'translate-x-5' : ''} {saving ? 'opacity-50' : ''}"
+                class="absolute top-0.5 left-0.5 h-5 w-5 transform rounded bg-white transition-transform duration-200 {preferences.hideFromLeaderboard ? 'translate-x-5' : ''} {saving ? 'opacity-50' : ''}"
               ></span>
             </button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Theme Settings Section -->
+    {#if !loading}
+      <div
+        class="mt-6 overflow-hidden rounded-none border-2 border-[var(--color-border)] shadow-[2px_2px_0_rgba(0,0,0,0.1)]"
+      >
+        <div class="border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-4">
+          <div class="flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-[var(--color-text-muted)]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+              />
+            </svg>
+            <span class="font-bold text-[var(--color-heading)]">Theme</span>
+          </div>
+        </div>
+
+        <div class="bg-[var(--color-secondary)] p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="font-medium text-[var(--color-text)]">Dark mode</p>
+              <p class="text-sm text-[var(--color-text-muted)]">
+                Switch between light and dark theme
+              </p>
+            </div>
+
+            <div class="w-11 flex-shrink-0">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={preferences.theme === 'dark'}
+                class="relative inline-flex h-6 w-11 cursor-pointer items-center rounded focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 focus:outline-none"
+                on:click={toggleTheme}
+                disabled={saving}
+              >
+                <span class="sr-only">Toggle dark mode</span>
+                <span
+                  class="absolute h-full w-full rounded transition-colors duration-200 {preferences.theme === 'dark' ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-text-muted)]'} {saving ? 'opacity-50' : ''}"
+                ></span>
+                <span
+                  class="absolute top-0.5 left-0.5 h-5 w-5 transform rounded bg-white transition-transform duration-200 {preferences.theme === 'dark' ? 'translate-x-5' : ''} {saving ? 'opacity-50' : ''}"
+                ></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {/if}
   {/if}
 </div>

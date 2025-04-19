@@ -148,14 +148,16 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
 </script>
 
 <div class="mt-4 w-full">
-  <div class="table-wrapper rounded-lg bg-[var(--color-secondary)] shadow-sm">
+  <div
+    class="table-wrapper rounded-md border-2 border-[var(--color-border)] bg-[var(--color-secondary)] shadow-[2px_2px_0_rgba(0,0,0,0.1)]"
+  >
     <table
-      class="w-full min-w-[900px] table-fixed border-collapse overflow-hidden bg-[var(--color-secondary)]"
+      class="w-full min-w-[900px] table-fixed border-collapse overflow-hidden bg-[var(--color-secondary)] font-mono text-sm"
     >
       <thead>
         <tr>
           <th
-            class="sticky top-0 z-10 w-[5%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            class="sticky top-0 z-10 w-[5%] cursor-pointer border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
             on:click={handleParticipatedFilter}
             title="Filter by participation status"
           >
@@ -213,7 +215,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             </div>
           </th>
           <th
-            class="sticky top-0 z-10 w-[6%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            class="sticky top-0 z-10 w-[6%] cursor-pointer border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
             style="min-width: 50px;"
             on:click={handleTypeFilter}
             title="Filter by contest type"
@@ -224,7 +226,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                   <div class="relative">
                     <img src={icpcLogo} alt="ICPC" class="h-6 w-6 object-contain" />
                     <div
-                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded-full border border-white bg-[rgb(34_197_94)]"
+                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded border border-white bg-[rgb(34_197_94)]"
                     ></div>
                   </div>
                 </span>
@@ -233,7 +235,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                   <div class="relative">
                     <img src={codeforcesLogo} alt="Codeforces" class="h-5 w-5 object-contain" />
                     <div
-                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded-full border border-white bg-[rgb(239_68_68)]"
+                      class="absolute -right-1 -bottom-1 h-3 w-3 rounded border border-white bg-[rgb(239_68_68)]"
                     ></div>
                   </div>
                 </span>
@@ -256,16 +258,18 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
               {/if}
             </div>
           </th>
-          <th class="sticky top-0 z-10 w-[34%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+          <th
+            class="sticky top-0 z-10 w-[34%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-left font-bold"
+          >
             Contest
           </th>
           <th
-            class="sticky top-0 z-10 w-[12%] bg-[var(--color-tertiary)] p-3 text-center font-bold"
+            class="sticky top-0 z-10 w-[12%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-center font-bold"
           >
             Duration
           </th>
           <th
-            class="sticky top-0 z-10 w-[15%] cursor-pointer bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            class="sticky top-0 z-10 w-[15%] cursor-pointer border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
             on:click={handleDifficultySort}
             title="Click to sort by difficulty"
           >
@@ -285,7 +289,9 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
               <span>Difficulty</span>
             </div>
           </th>
-          <th class="sticky top-0 z-10 w-[21%] bg-[var(--color-tertiary)] p-3 text-left font-bold">
+          <th
+            class="sticky top-0 z-10 w-[21%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-left font-bold"
+          >
             <div class="flex items-center gap-2">
               <RecommendersFilter
                 authors={uniqueAuthors}
@@ -298,7 +304,8 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
               />
             </div>
           </th>
-          <th class="sticky top-0 z-10 w-[5%] bg-[var(--color-tertiary)] p-3 text-right font-bold"
+          <th
+            class="sticky top-0 z-10 w-[5%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-right font-bold"
           ></th>
         </tr>
       </thead>
@@ -308,16 +315,16 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0
             ${contest.id && userParticipation.has(contest.id)
               ? 'border-l-4 border-l-[rgb(34_197_94)] bg-[var(--color-solved-row)]'
-              : 'hover:bg-black/5'}"
+              : 'hover:bg-[var(--color-tertiary)]/30'}"
           >
             <td class="p-3 text-center">
               {#if contest.id}
                 {@const hasParticipated = userParticipation.has(contest.id)}
                 <button
-                  class={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full shadow-sm transition-all duration-300
+                  class={`flex h-8 w-8 cursor-pointer items-center justify-center rounded shadow-[1px_1px_0_rgba(0,0,0,0.1)] transition-all duration-300
                     ${hasParticipated
-                      ? 'solved-button bg-[rgb(34_197_94)] text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]'
-                      : 'border border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(34_197_94)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)] hover:shadow-[0_0_5px_rgba(34,197,94,0.2)]'
+                      ? 'bg-[rgb(34_197_94)] text-white'
+                      : 'border-2 border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[rgb(34_197_94)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)]'
                     } ${!isAuthenticated ? 'cursor-not-allowed opacity-50' : ''}`}
                   on:click={() => isAuthenticated && onToggleParticipation(contest.id!, !hasParticipated)}
                   title={hasParticipated ? 'Mark as not participated' : 'Mark as participated'}
@@ -326,8 +333,8 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -367,7 +374,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             </td>
             <td class="p-3 text-center">
               {#if contest.difficulty !== undefined}
-                <span class={`text-lg font-bold ${getDifficultyColorClass(contest.difficulty)}`}>
+                <span class={`text-2xl font-bold ${getDifficultyColorClass(contest.difficulty)}`}>
                   {getDifficultyStars(contest.difficulty)}
                 </span>
               {:else}
@@ -392,7 +399,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
 
                   <!-- Like button -->
                   <button
-                    class={`flex cursor-pointer items-center gap-1 rounded border px-2 py-1 transition-all duration-200
+                    class={`flex cursor-pointer items-center gap-1 rounded border-2 px-2 py-1 transition-all duration-200
                       ${hasLiked
                         ? 'border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] text-[rgb(34_197_94)]'
                         : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(34_197_94)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(34_197_94)_10%,transparent)] hover:text-[rgb(34_197_94)]'
@@ -407,8 +414,8 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
+                      width="18"
+                      height="18"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -426,7 +433,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
 
                   <!-- Dislike button -->
                   <button
-                    class={`flex cursor-pointer items-center gap-1 rounded border px-2 py-1 transition-all duration-200
+                    class={`flex cursor-pointer items-center gap-1 rounded border-2 px-2 py-1 transition-all duration-200
                       ${hasDisliked
                         ? 'border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] text-[rgb(239_68_68)]'
                         : 'border-[var(--color-border)] bg-transparent text-[var(--color-text)] hover:border-[color-mix(in_oklab,rgb(239_68_68)_50%,transparent)] hover:bg-[color-mix(in_oklab,rgb(239_68_68)_10%,transparent)] hover:text-[rgb(239_68_68)]'
@@ -441,8 +448,8 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
+                      width="18"
+                      height="18"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -474,14 +481,14 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
   position: relative;
 }
 
-/* Add smooth transitions for solved button */
-.solved-button {
-  transition: all 0.3s ease;
+/* Add smooth transitions for buttons */
+button {
+  transition: all 0.2s ease;
 }
 
 /* Add hover effects */
-tr:hover .solved-button:not(:hover) {
-  transform: scale(1.05);
+button:hover {
+  transform: translateY(1px);
 }
 
 /* Ensure proper text truncation */
