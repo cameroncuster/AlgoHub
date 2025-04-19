@@ -1,17 +1,17 @@
 <script lang="ts">
-// About page for AlgoHub
+// About page for gitgud
 </script>
 
 <svelte:head>
-  <title>AlgoHub | About</title>
+  <title>gitgud | About</title>
   <meta name="description" content="About this app" />
 </svelte:head>
 
 <div class="mx-auto max-w-3xl px-4 py-8">
   <section class="mb-10">
-    <h2 class="text-accent mb-4 text-2xl">AlgoHub</h2>
+    <h2 class="text-accent mb-4 text-2xl">gitgud</h2>
     <p class="mb-4 leading-relaxed">
-      AlgoHub is a collection of hand-picked problems. If you are new to competitive programming you
+      gitgud is a collection of hand-picked problems. If you are new to competitive programming you
       can learn the fundamentals at some of these sites:
     </p>
     <ul class="mb-4 ml-6">
@@ -50,7 +50,7 @@
     <p class="mb-4 leading-relaxed">
       It's a great approach, but the quality of problems on any given archive can vary greatly. If
       only there were a way to extract the highest quality problems available on the internet. We
-      think we can do this! AlgoHub is a social site that allows users to curate and maintain their
+      think we can do this! gitgud is a social site that allows users to curate and maintain their
       own lists of recommendations.
     </p>
 
@@ -61,7 +61,7 @@
       problems.
     </p>
     <p class="mb-4 leading-relaxed">
-      AlgoHub aims to collect these Canon Problems to enable you to maximize the effectiveness of
+      gitgud aims to collect these Canon Problems to enable you to maximize the effectiveness of
       your practice by leveraging the collective knowledge of the competitive programming community.
     </p>
   </section>
@@ -99,7 +99,7 @@
   <section class="mb-10">
     <h2 class="text-accent mb-4 text-2xl">Algorithm Libraries</h2>
 
-    <h3 class="text-accent mb-4 text-xl">AlgoHub's Library of Choice</h3>
+    <h3 class="text-accent mb-4 text-xl">gitgud's Library of Choice</h3>
     <ul class="mb-4 ml-6">
       <li class="mb-2 leading-relaxed">
         <a
@@ -247,9 +247,9 @@
   <section class="mb-10">
     <h2 class="text-accent mb-4 text-2xl">Contribute</h2>
     <p class="mb-4 leading-relaxed">
-      AlgoHub is an open-source project, and we welcome contributions from the community. If you'd
-      like to help improve AlgoHub, please check out our <a
-        href="https://github.com/cameroncuster/AlgoHub"
+      gitgud is an open-source project, and we welcome contributions from the community. If you'd
+      like to help improve gitgud, please check out our <a
+        href="https://github.com/cameroncuster/gitgud"
         target="_blank"
         rel="noopener noreferrer">GitHub repository</a
       >.

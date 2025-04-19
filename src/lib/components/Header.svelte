@@ -131,8 +131,8 @@ $: if ($page) {
         aria-label="Home"
         class="flex items-center gap-2 text-xl font-bold text-[var(--color-heading)] no-underline"
       >
-        <img src="/favicon.png" alt="AlgoHub Logo" class="h-6 w-6 object-contain" />
-        <span>AlgoHub</span>
+        <img src="/favicon.png" alt="gitgud Logo" class="h-12 w-12 object-contain" />
+        <span>gitgud.cc</span>
       </a>
     </div>
 
