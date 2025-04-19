@@ -35,7 +35,7 @@ function formatNumber(num: number): string {
       <tbody>
         {#each leaderboardEntries as entry}
           <tr
-            class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0 hover:bg-black/5"
+            class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0 hover:bg-[var(--color-tertiary)]/30"
           >
             <td class="p-2 text-center sm:p-3">
               <!-- Rank with special styling for top 3 -->

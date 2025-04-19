@@ -106,8 +106,8 @@ onMount(() => {
       <button
         class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
           selectedTopic === null
-            ? 'scale-102 bg-[var(--color-secondary)] text-white shadow-sm'
-            : 'text-[var(--color-text)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:shadow-sm'
+            ? 'scale-102 bg-[var(--color-accent)] text-white shadow-sm'
+            : 'text-[var(--color-heading)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:text-[var(--color-heading)] hover:shadow-sm'
         }`}
         on:click={() => onSelectTopic(null)}
       >
@@ -118,8 +118,8 @@ onMount(() => {
         <button
           class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
             selectedTopic === topic
-              ? 'scale-102 bg-[var(--color-secondary)] text-white shadow-sm'
-              : 'text-[var(--color-text)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:shadow-sm'
+              ? 'scale-102 bg-[var(--color-accent)] text-white shadow-sm'
+              : 'text-[var(--color-heading)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:text-[var(--color-heading)] hover:shadow-sm'
           }`}
           on:click={() => onSelectTopic(topic)}
         >
@@ -140,8 +140,8 @@ onMount(() => {
       <button
         class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
           selectedTopic === null
-            ? 'scale-102 bg-[var(--color-primary)] text-white shadow-sm'
-            : 'text-[var(--color-text)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:shadow-sm'
+            ? 'scale-102 bg-[var(--color-accent)] text-white shadow-sm'
+            : 'text-[var(--color-heading)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:text-[var(--color-heading)] hover:shadow-sm'
         }`}
         on:click={() => onSelectTopic(null)}
       >
@@ -152,8 +152,8 @@ onMount(() => {
         <button
           class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
             selectedTopic === topic
-              ? 'scale-102 bg-[var(--color-primary)] text-white shadow-sm'
-              : 'text-[var(--color-text)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:shadow-sm'
+              ? 'scale-102 bg-[var(--color-accent)] text-white shadow-sm'
+              : 'text-[var(--color-heading)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:text-[var(--color-heading)] hover:shadow-sm'
           }`}
           on:click={() => onSelectTopic(topic)}
         >

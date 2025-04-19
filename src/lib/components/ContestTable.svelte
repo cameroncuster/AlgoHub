@@ -308,7 +308,7 @@ function getDifficultyColorClass(difficulty: number | undefined): string {
             class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0
             ${contest.id && userParticipation.has(contest.id)
               ? 'border-l-4 border-l-[rgb(34_197_94)] bg-[var(--color-solved-row)]'
-              : 'hover:bg-black/5'}"
+              : 'hover:bg-[var(--color-tertiary)]/30'}"
           >
             <td class="p-3 text-center">
               {#if contest.id}

@@ -9,6 +9,8 @@
     --font-mono: 'Fira Mono', monospace;
 
     /* Colors - Retro Computer Theme - Blue & Pink */
+    /* These are the default colors that will be overridden by theme selection */
+    /* The same variables are defined in src/lib/theme-options/retro-blue-light.js */
     --color-white: oklch(1 0 0);
     --color-black: oklch(0 0 0);
     --color-primary: oklch(0.9 0.03 240); /* Light blue background */
