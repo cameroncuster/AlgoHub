@@ -314,3 +314,14 @@ img {
   width: 100%;
   margin: 0 auto;
 }
+
+/* Dark theme specific overrides */
+body.dark-theme .text-red-500,
+body.dark-theme .text-red-600,
+body.dark-theme .text-red-700 {
+  color: rgb(252, 165, 165) !important; /* lighter red for dark theme */
+}
+
+body.dark-theme .text-[var(--color-accent)] {
+  color: rgb(252, 165, 165) !important; /* lighter red for dark theme */
+}

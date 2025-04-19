@@ -18,6 +18,7 @@ export const currentTheme = writable<string>('light');
 export function applyTheme(theme: string): void {
   if (!browser) return;
 
+  // Update the store
   currentTheme.set(theme);
 
   // Apply the selected theme
@@ -26,10 +27,16 @@ export function applyTheme(theme: string): void {
   switch (theme) {
     case 'dark':
       themeColors = retroBlueDarkTheme.colors;
+      // Add a class to the body for easier CSS targeting
+      document.body.classList.add('dark-theme');
+      document.body.classList.remove('light-theme');
       break;
     case 'light':
     default:
       themeColors = retroBlueLightTheme.colors;
+      // Add a class to the body for easier CSS targeting
+      document.body.classList.add('light-theme');
+      document.body.classList.remove('dark-theme');
       break;
   }
 

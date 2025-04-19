@@ -95,11 +95,19 @@ function toggleHideFromLeaderboard(): void {
 
 // Toggle the theme setting
 function toggleTheme(): void {
-  preferences.theme = preferences.theme === 'light' ? 'dark' : 'light';
+  // Toggle the theme
+  const newTheme = preferences.theme === 'light' ? 'dark' : 'light';
+  preferences.theme = newTheme;
+
   // Apply theme immediately for better UX
-  applyTheme(preferences.theme);
+  applyTheme(newTheme);
+
   // Save to localStorage for immediate persistence
-  localStorage.setItem('gitgud-theme', preferences.theme);
+  localStorage.setItem('gitgud-theme', newTheme);
+
+  // Force a re-render by creating a new object
+  preferences = { ...preferences };
+
   // Save to database
   savePreferences();
 }
