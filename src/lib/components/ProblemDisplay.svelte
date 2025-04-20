@@ -17,7 +17,7 @@ import ProblemTable from '$lib/components/ProblemTable.svelte';
 import TopicSidebar from '$lib/components/TopicSidebar.svelte';
 
 // Props
-export let pageTitle = "Problems";
+export let pageTitle = 'Problems';
 export let targetUserId: string | null = null;
 export let defaultSolvedFilterState: 'all' | 'solved' | 'unsolved' = 'all';
 
@@ -416,7 +416,7 @@ onMount(() => {
     const pathParts = window.location.pathname.split('/');
     targetUserId = pathParts[pathParts.length - 1];
   }
-  
+
   loadProblems();
 
   // Subscribe to auth state changes
@@ -478,12 +478,8 @@ onMount(() => {
       </div>
     </div>
   {:else if error}
-    <div class="py-2 text-center text-red-500">
-      <p>{error}</p>
-      <button
-        class="hover:bg-opacity-90 mt-2 rounded bg-[var(--color-primary)] px-4 py-2 text-white transition-colors"
-        on:click={() => window.location.reload()}>Try Again</button
-      >
+    <div class="flex h-[calc(100vh-4rem)] items-center justify-center py-2 text-center">
+      <p class="text-lg text-red-500">{error}</p>
     </div>
   {:else}
     <div class="relative flex min-h-[calc(100vh-2rem)]">
