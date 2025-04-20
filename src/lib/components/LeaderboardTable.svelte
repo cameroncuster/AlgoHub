@@ -8,6 +8,34 @@ export let leaderboardEntries: LeaderboardEntry[] = [];
 function formatNumber(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
+
+// Get rank color class based on Codeforces tier system - sequential assignment
+function getRankColor(rank: number): string {
+  if (rank === 1) return 'legendary-grandmaster';
+  if (rank === 2) return 'international-grandmaster';
+  if (rank === 3) return 'grandmaster';
+  if (rank === 4) return 'international-master';
+  if (rank === 5) return 'master';
+  if (rank === 6) return 'candidate-master';
+  if (rank === 7) return 'expert';
+  if (rank === 8) return 'specialist';
+  if (rank === 9) return 'pupil';
+  return 'newbie';
+}
+
+// Get rank tier name for display - sequential assignment
+function getRankTierName(rank: number): string {
+  if (rank === 1) return 'Legendary Grandmaster';
+  if (rank === 2) return 'International Grandmaster';
+  if (rank === 3) return 'Grandmaster';
+  if (rank === 4) return 'International Master';
+  if (rank === 5) return 'Master';
+  if (rank === 6) return 'Candidate Master';
+  if (rank === 7) return 'Expert';
+  if (rank === 8) return 'Specialist';
+  if (rank === 9) return 'Pupil';
+  return 'Newbie';
+}
 </script>
 
 <div class="mt-4 w-full">
@@ -42,27 +70,30 @@ function formatNumber(num: number): string {
             class="relative border-b border-[var(--color-border)] transition-colors duration-200 last:border-b-0 hover:bg-[var(--color-tertiary)]/30"
           >
             <td class="p-2 text-center sm:p-3">
-              <!-- Rank with special styling for top 3 -->
+              <!-- Rank with styling based on Codeforces tiers -->
               {#if entry.rank === 1}
                 <span
-                  class="inline-flex h-8 w-8 items-center justify-center rounded bg-[var(--color-legendary-grandmaster)] font-bold text-white shadow-[1px_1px_0_rgba(0,0,0,0.1)]"
+                  class="inline-flex h-8 w-8 items-center justify-center rounded border-2 border-black font-bold text-white shadow-[1px_1px_0_rgba(0,0,0,0.1)]"
+                  style="background-color: var(--color-{getRankColor(entry.rank)})"
+                  title={getRankTierName(entry.rank)}
                 >
                   {entry.rank}
                 </span>
-              {:else if entry.rank === 2}
+              {:else if entry.rank <= 9}
                 <span
-                  class="inline-flex h-8 w-8 items-center justify-center rounded bg-[var(--color-specialist)] font-bold text-white shadow-[1px_1px_0_rgba(0,0,0,0.1)]"
-                >
-                  {entry.rank}
-                </span>
-              {:else if entry.rank === 3}
-                <span
-                  class="inline-flex h-8 w-8 items-center justify-center rounded bg-[var(--color-pupil)] font-bold text-white shadow-[1px_1px_0_rgba(0,0,0,0.1)]"
+                  class="inline-flex h-8 w-8 items-center justify-center rounded font-bold text-white shadow-[1px_1px_0_rgba(0,0,0,0.1)]"
+                  style="background-color: var(--color-{getRankColor(entry.rank)})"
+                  title={getRankTierName(entry.rank)}
                 >
                   {entry.rank}
                 </span>
               {:else}
-                <span class="font-medium text-[var(--color-text-muted)]">{entry.rank}</span>
+                <span
+                  class="inline-flex h-8 w-8 items-center justify-center rounded bg-[var(--color-newbie)] font-bold text-white shadow-[1px_1px_0_rgba(0,0,0,0.1)]"
+                  title="Newbie"
+                >
+                  {entry.rank}
+                </span>
               {/if}
             </td>
             <td class="p-2 sm:p-3">
