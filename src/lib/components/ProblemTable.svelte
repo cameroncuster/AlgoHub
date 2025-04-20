@@ -243,7 +243,7 @@ function getDifficultyTooltip(problem: Problem): string {
             >Problem</th
           >
           <th
-            class="sticky top-0 z-10 w-[10%] cursor-pointer border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 py-4 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
+            class="sticky top-0 z-10 w-[11%] cursor-pointer border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 py-4 text-center font-bold transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--color-tertiary)_90%,var(--color-accent)_10%,transparent)]"
             on:click={handleDifficultySort}
             title="Click to sort by difficulty"
           >
@@ -268,7 +268,7 @@ function getDifficultyTooltip(problem: Problem): string {
             >Topic</th
           >
           <th
-            class="sticky top-0 z-10 w-[25%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-left font-bold"
+            class="sticky top-0 z-10 w-[24%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-left font-bold"
           >
             <div class="flex w-full items-center gap-2">
               <RecommendersFilter
