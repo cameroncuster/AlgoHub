@@ -268,12 +268,13 @@ function getDifficultyTooltip(problem: Problem): string {
             >Topic</th
           >
           <th
-            class="sticky top-0 z-10 w-[22%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-left font-bold"
+            class="sticky top-0 z-10 w-[25%] border-b-2 border-[var(--color-border)] bg-[var(--color-tertiary)] p-3 text-left font-bold"
           >
-            <div class="flex items-center gap-2">
+            <div class="flex w-full items-center gap-2">
               <RecommendersFilter
                 authors={uniqueAuthors}
                 selectedAuthor={authorFilterValue}
+                width="w-full"
                 onAuthorChange={(author) => {
                   authorFilterValue = author;
                   dispatch('filterAuthor', { author: authorFilterValue });
