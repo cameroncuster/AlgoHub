@@ -261,6 +261,34 @@ export async function fetchUserSolvedProblems(): Promise<Set<string>> {
 }
 
 /**
+ * Fetches solved problems for a specific user
+ * @param userId - User ID to fetch solved problems for
+ * @returns Set of solved problem IDs
+ */
+export async function fetchUserSolvedProblemsByUserId(userId: string): Promise<Set<string>> {
+  if (!userId) {
+    return new Set();
+  }
+
+  try {
+    // Use the RPC function to get solved problems for a user who isn't hidden from the leaderboard
+    const { data, error } = await supabase.rpc('get_user_solved_problems', {
+      p_user_id: userId
+    });
+
+    if (error) {
+      console.error(`Error fetching solved problems for user ${userId}:`, error);
+      return new Set();
+    }
+
+    return new Set(data.map((item: { problem_id: string }) => item.problem_id));
+  } catch (err) {
+    console.error(`Failed to fetch solved problems for user ${userId}:`, err);
+    return new Set();
+  }
+}
+
+/**
  * Marks a problem as solved or unsolved by the current user
  * @param problemId - Problem ID
  * @param isSolved - Whether to mark as solved (true) or unsolved (false)

@@ -111,15 +111,39 @@ function getRankTierName(rank: number): string {
                     {entry.username.substring(0, 2).toUpperCase()}
                   </div>
                 {/if}
-                <a
-                  href={entry.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-[var(--color-username)] hover:text-[color-mix(in_oklab,var(--color-username)_80%,white)] hover:underline"
-                  title={"@" + entry.username}
-                >
-                  @{entry.username}
-                </a>
+                <div class="flex items-center gap-2">
+                  <a
+                    href={`/user/${entry.userId}`}
+                    class="text-[var(--color-username)] hover:text-[color-mix(in_oklab,var(--color-username)_80%,white)] hover:underline"
+                    title={"View @" + entry.username + "'s solved problems"}
+                  >
+                    @{entry.username}
+                  </a>
+                  <a
+                    href={entry.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:underline"
+                    title={"View @" + entry.username + "'s GitHub profile"}
+                    aria-label={"View @" + entry.username + "'s GitHub profile"}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                  </a>
+                </div>
               </div>
             </td>
             <td class="p-2 text-center font-medium sm:p-3">
@@ -182,11 +206,11 @@ function getRankTierName(rank: number): string {
 }
 
 /* Ensure username is always purple */
-a[href*='github.com'] {
+a[href^='/user/'] {
   color: var(--color-username) !important;
 }
 
-a[href*='github.com']:hover {
+a[href^='/user/']:hover {
   color: color-mix(in oklab, var(--color-username) 80%, white) !important;
 }
 </style>
