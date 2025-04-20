@@ -10,6 +10,9 @@ export let isMobile: boolean = false;
 export let isOpen: boolean = false;
 export let onToggle: () => void;
 
+// Special topic value for NEW problems
+const NEW_TOPIC = 'NEW';
+
 let touchStartX = 0;
 let touchEndX = 0;
 
@@ -114,6 +117,18 @@ onMount(() => {
         All
       </button>
 
+      <!-- Special NEW button with different styling -->
+      <button
+        class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
+          selectedTopic === NEW_TOPIC
+            ? 'scale-102 bg-[var(--color-accent)] text-white shadow-sm'
+            : 'text-[var(--color-heading)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:text-[var(--color-heading)] hover:shadow-sm'
+        } border-2 border-dashed border-[var(--color-accent)] font-bold`}
+        on:click={() => onSelectTopic(NEW_TOPIC)}
+      >
+        NEW
+      </button>
+
       {#each topics as topic}
         <button
           class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
@@ -146,6 +161,18 @@ onMount(() => {
         on:click={() => onSelectTopic(null)}
       >
         All Topics
+      </button>
+
+      <!-- Special NEW button with different styling for mobile -->
+      <button
+        class={`w-full rounded-md px-3 py-2 text-left transition-all duration-200 ${
+          selectedTopic === NEW_TOPIC
+            ? 'scale-102 bg-[var(--color-accent)] text-white shadow-sm'
+            : 'text-[var(--color-heading)] hover:scale-102 hover:bg-[var(--color-tertiary)] hover:text-[var(--color-heading)] hover:shadow-sm'
+        } border-2 border-dashed border-[var(--color-accent)] font-bold`}
+        on:click={() => onSelectTopic(NEW_TOPIC)}
+      >
+        NEW
       </button>
 
       {#each topics as topic}

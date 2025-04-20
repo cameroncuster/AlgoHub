@@ -375,7 +375,11 @@ function getDifficultyTooltip(problem: Problem): string {
                   {problem.type}
                 </span>
               {:else}
-                <span class="text-[var(--color-text-muted)]">-</span>
+                <span
+                  class="inline-block rounded border-2 border-dashed border-[var(--color-accent)] bg-transparent px-2 py-1 text-sm font-bold text-[var(--color-accent)]"
+                >
+                  NEW!
+                </span>
               {/if}
             </td>
             <td class="truncate p-3">

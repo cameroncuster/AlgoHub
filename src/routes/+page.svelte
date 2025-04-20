@@ -90,19 +90,27 @@ function sortProblemsByDifficulty(
 
 // Filter states
 
+// Special topic value for NEW problems
+const NEW_TOPIC = 'NEW';
+
 // Function to get problems filtered by everything except author
 function getProblemsWithoutAuthorFilter(): Problem[] {
   let filtered = [...problems];
 
   // Apply topic filter if selected
   if (selectedTopic) {
-    filtered = filtered.filter((problem) => {
-      // If topic is "misc", include problems with no type or with "misc" type
-      if (selectedTopic === 'misc') {
-        return !problem.type || problem.type === 'misc';
-      }
-      return problem.type === selectedTopic;
-    });
+    if (selectedTopic === NEW_TOPIC) {
+      // For NEW topic, filter problems with null or undefined type
+      filtered = filtered.filter((problem) => !problem.type);
+    } else {
+      filtered = filtered.filter((problem) => {
+        // If topic is "misc", include problems with no type or with "misc" type
+        if (selectedTopic === 'misc') {
+          return !problem.type || problem.type === 'misc';
+        }
+        return problem.type === selectedTopic;
+      });
+    }
   }
 
   // Apply solved filter if not 'all'
