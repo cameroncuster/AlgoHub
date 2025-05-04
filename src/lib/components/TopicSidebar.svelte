@@ -92,7 +92,7 @@ onMount(() => {
 <!-- Overlay for mobile -->
 {#if isOpen && isMobile}
   <div
-    class="bg-opacity-50 fixed inset-0 z-30 bg-black backdrop-blur-sm transition-opacity md:hidden"
+    class="fixed inset-0 z-30 bg-black/30 transition-opacity md:hidden"
     on:click={onToggle}
     on:keydown={(e) => e.key === 'Escape' && onToggle()}
     role="button"
